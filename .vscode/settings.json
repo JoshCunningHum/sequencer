@@ -9,5 +9,8 @@
         ["ui:\\s*{([^)]*)\\s*}", "[\"'`]([^\"'`]*).*?[\"'`]"],
         ["/\\*\\s?ui\\s?\\*/\\s*{([^;]*)}", ":\\s*[\"'`]([^\"'`]*).*?[\"'`]"]
     ],
-    "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui"]
+    "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui"],
+    "nuxtr.intellisense.nuxtrc": true,
+    "nuxtr.intellisense.vueFiles": true,
+    "nuxtr.intellisense.nuxtignore": true
 }

@@ -1,0 +1,23 @@
+{
+    "folders": [
+        {
+            "path": ".",
+        },
+    ],
+    "settings": {
+        "files.associations": {
+            "*.css": "tailwindcss",
+        },
+        "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui"],
+        "nuxtr.intellisense.nuxtrc": true,
+        "nuxtr.intellisense.vueFiles": true,
+        "nuxtr.intellisense.nuxtignore": true,
+        "nuxtr.openItemsAfterCreation": true,
+        "nuxtr.defaultPackageManager": "NPM",
+        "nuxtr.piniaFiles.defaultTemplate": "setup",
+        "nuxtr.vueFiles.firstTag": "script",
+        "nuxtr.vueFiles.style.alwaysScoped": true,
+        "nuxtr.vueFiles.style.defaultLanguage": "scss",
+        "material-icon-theme.activeIconPack": "vue_vuex",
+    },
+}

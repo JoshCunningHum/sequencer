@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: false },
+  css: [
+    "~/assets/global.css",
+  ],
   modules: [
     "@pinia/nuxt",
     "@vueuse/nuxt",
@@ -8,19 +11,29 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     'nuxt-typed-router',
     "@nuxtjs/supabase",
-    "@nuxt/fonts"
+    "@nuxt/fonts",
+    '@morev/vue-transitions/nuxt',
   ],
   ui: {
     global: true,
     icons: ['mdi']
   },
+  colorMode: {
+    preference: 'dark'
+  },
+  app: {
+    head: {
+      title: 'SQNCR',
+    }
+  },
+  vite: {
+    vue: {
+      script: {
+        propsDestructure: true
+      }
+    }
+  },
   supabase: {
-    redirectOptions: {
-      login: '/login',
-      callback: '/login',
-      include: undefined,
-      exclude: [],
-      cookieRedirect: false,
-    }  
+    redirect: false
   }
 })

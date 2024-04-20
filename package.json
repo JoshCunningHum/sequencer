@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@iconify-json/mdi": "^1.1.66",
+    "@morev/vue-transitions": "^3.0.2",
     "@nuxt/fonts": "^0.6.1",
     "@nuxt/image": "^1.5.0",
     "@nuxt/ui": "^2.15.2",
@@ -21,6 +22,7 @@
     "nuxt-typed-router": "^3.6.3",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "yup": "^1.4.0"
   }
 }
