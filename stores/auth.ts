@@ -5,5 +5,6 @@ export const useAuthStore = defineStore('Auth', () => {
   const user = useSupabaseUser();
   const supabase = useSupabase();
 
-  return {}
+  return {
+  }
 })

@@ -31,6 +31,13 @@ export default defineNuxtConfig({
       script: {
         propsDestructure: true
       }
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@use "~/assets/_colors.scss" as *;'
+        }
+      }
     }
   },
   supabase: {

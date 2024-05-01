@@ -13,13 +13,7 @@ const logout = async () => {
 
 <template>
     <div>
-        Hello this is dashboard
-
-        <UButton
-            label="Logout"
-            color="red"
-            @click="logout"
-        />
+        <Nav header="Dashboard" />
     </div>
 </template>
 
