@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+// Props and Emits
+const emit = defineEmits<{
+    (e: "loaded"): void;
+}>();
+
 const class_default = useDrawIOClassDefault();
 
 const params = {
@@ -8,12 +13,8 @@ const params = {
     dark: 1,
     proto: "json",
     format: "xml",
+    noExitBtn: 1,
 };
-
-interface DrawIOMsg {
-    event: "init" | "export" | "autosave" | "save" | "exit";
-    xml?: string;
-}
 
 const embedlink = "https://embed.diagrams.net";
 
@@ -30,6 +31,11 @@ const post = (msg: any) => {
     frame.value.contentWindow?.postMessage(JSON.stringify(msg), "*");
 };
 
+interface DrawIOMsg {
+    event: "init" | "export" | "autosave" | "save" | "exit";
+    xml?: string;
+}
+
 const receive = (evt: MessageEvent) => {
     if (evt.origin !== embedlink) return;
 
@@ -38,8 +44,9 @@ const receive = (evt: MessageEvent) => {
     switch (msg.event) {
         case "init":
             post({ action: "load", autosave: 1, xml: class_default });
+            emit("loaded");
         case "save":
-            console.log(msg.xml);
+            console.log(msg);
     }
 };
 
@@ -55,8 +62,10 @@ onUnmounted(() => {
 <template>
     <Fill>
         <iframe
+            :allowtransparency="true"
             ref="frame"
             class="w-full h-full bg-primary"
+            style="background: black"
             :src="`${embedlink}/?${params_processed}`"
             :frameborder="0"
         />

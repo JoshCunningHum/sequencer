@@ -11,10 +11,12 @@ const {
     orientation = "vertical",
     steps,
     noCurrent = false,
+    disabled = false,
 } = defineProps<{
     orientation?: "vertical" | "horizontal";
     steps: (Step | string)[];
     noCurrent?: boolean;
+    disabled?: boolean;
 }>();
 
 // Handles highlighting
@@ -27,9 +29,6 @@ const container = ref<InstanceType<typeof HTMLDivElement>>();
 const Step = ({ value, index }: { value: Step | string; index: number }) => {
     const txt = typeof value === "string" ? value : value.label;
     const isCurrent = index === current.value;
-    const border = `border ${isCurrent ? "border-accent" : "border-secondary"}`;
-    const bg = `${isCurrent ? "bg-accent" : "bg-primary"}`;
-    const color = `${isCurrent ? "text-primary" : "text-white"}`;
 
     return (
         <div
@@ -37,9 +36,25 @@ const Step = ({ value, index }: { value: Step | string; index: number }) => {
                 if (noCurrent) return;
                 current.value = index;
             }}
-            class={`${border} ${bg} ${color} rounded-sm z-10 px-2 py-1 text-center font-semibold text-sm cursor-pointer`}
+            class={`z-10 bg-primary ${disabled ? "cursor-not-allowed" : ""}`}
         >
-            {txt}
+            <UButton
+                disabled={disabled}
+                block
+                color={isCurrent ? "primary" : "gray"}
+                class="z-10 break-keep"
+                size="sm"
+            >
+                <span
+                    style={{
+                        "word-break": "keep-all",
+                        hyphens: "none",
+                        "white-space": "nowrap",
+                    }}
+                >
+                    {txt}
+                </span>
+            </UButton>
         </div>
     );
 };
@@ -52,7 +67,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="w-fit p-3 relative">
+    <div class="p-3 relative">
         <div
             class="absolute w-1 bg-secondary top-[1rem] left-[50%]"
             :style="{ height: `calc(${stepLineHeight}px - 1rem)` }"
@@ -72,4 +87,6 @@ onMounted(() => {
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@use "~/assets/_colors.scss" as *;
+</style>
