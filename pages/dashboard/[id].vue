@@ -8,6 +8,11 @@ import {
 } from "../../components/DrawIOEmbed.vue";
 import { get, set } from "@vueuse/core";
 import { useRouteParams } from "@vueuse/router";
+import { useDevStore } from "../../stores/dev";
+
+// Dev Mode
+const devStore = useDevStore();
+const { enabled: devMode } = storeToRefs(devStore);
 
 // Routing
 const router = useRouter();
@@ -33,7 +38,10 @@ const { isLoading } = useAsyncState(async () => {
 }, undefined);
 
 // Steps
-const steps = ["Diagrams", "Confirmation", "Generate"];
+const _steps = ["Diagrams", "Confirmation", "Generate"];
+const steps = computed(() =>
+    _steps.filter((_) => devMode.value || _ !== "Confirmation")
+);
 const diagrams = ["Class Diagram", "Use Case Diagram"];
 
 const step = ref(0);
@@ -78,7 +86,9 @@ const xml = computed<string>({
             v-if="!!project"
         >
             <!-- Header -->
-            <div class="border-secondary border-b p-2">
+            <div
+                class="border-secondary border-b p-2 flex justify-between items-center"
+            >
                 <StepNav
                     :steps="steps"
                     v-model="step"
@@ -103,15 +113,25 @@ const xml = computed<string>({
                                 v-model="diagram"
                             />
                         </UButtonGroup>
-                        <UButton
-                            @click="click()"
-                            class="z-10"
-                            :color="step === index ? 'primary' : 'gray'"
+                        <UChip
                             v-else
-                            >{{ s }}</UButton
+                            :show="s === 'Confirmation'"
+                            class="z-10"
+                            size="lg"
+                            inset
+                            color="red"
+                            text="DEV"
                         >
+                            <UButton
+                                @click="click()"
+                                :color="step === index ? 'primary' : 'gray'"
+                                >{{ s }}</UButton
+                            >
+                        </UChip>
                     </template>
                 </StepNav>
+
+                <DevToggle />
             </div>
 
             <!--Body -->
