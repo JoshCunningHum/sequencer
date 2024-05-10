@@ -1,8 +1,8 @@
-$primary: #121212;
-$secondary: #3d3d3d;
+$primary: #212121;
+$secondary: #303030;
 $accent: #40dc82;
 
-$emph-factor: 7.5%;
+$emph-factor: 1.8%;
 
 $_values: (
     primary: $primary,
@@ -15,6 +15,12 @@ $_values: (
         lightness($value) > 50,
         darken($value, $emph-factor),
         lighten($value, $emph-factor)
+    );
+
+    $empht: if(
+        lightness($value) > 50,
+        darken($value, $emph-factor * 10),
+        lighten($value, $emph-factor * 10)
     );
 
     .bg-#{$key} {
@@ -38,6 +44,6 @@ $_values: (
     }
 
     .text-#{$key}-emph {
-        color: $emph;
+        color: $empht;
     }
 }

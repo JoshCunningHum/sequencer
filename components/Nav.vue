@@ -12,7 +12,9 @@ const side_open = ref(false);
 </script>
 
 <template>
-    <div class="px-4 py-2 flex justify-between bg-primary-emph">
+    <div
+        class="px-4 py-2 flex justify-between bg-primary-emph border-secondary border-r border-b"
+    >
         <div class="flex items-center gap-2">
             <UButton
                 color="gray"

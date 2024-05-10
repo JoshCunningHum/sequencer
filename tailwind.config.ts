@@ -9,5 +9,6 @@ export default <Partial<Config>>{
         video: '16 / 9'
       }
     }
-  }
+  },
+  content: [ "./components/**/*.{html,js,vue}", "./pages/**/*.{html,js,vue}" ]
 }

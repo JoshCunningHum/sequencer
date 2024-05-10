@@ -37,7 +37,7 @@ const links = reactive([
 </script>
 
 <template>
-    <div class="h-full">
+    <div class="h-full bg-primary">
         <!-- Avatar -->
         <div class="px-4 py-2 flex gap-4 items-center">
             <UAvatar

@@ -1,10 +1,27 @@
+<script lang="ts">
+export const class_default = useDrawIOClassDefault();
+export const usecase_default = useDrawIOUseCaseDefault();
+</script>
+
 <script lang="ts" setup>
+import { set } from "@vueuse/core";
+
 // Props and Emits
-const emit = defineEmits<{
-    (e: "loaded"): void;
+const { noAutosave = false, saving = false } = defineProps<{
+    noAutosave?: boolean;
+    saving?: boolean;
 }>();
 
-const class_default = useDrawIOClassDefault();
+const emit = defineEmits<{
+    (e: "loaded"): void;
+    (e: "save", data: string): void;
+}>();
+
+const model = defineModel<string>({
+    default: class_default,
+});
+
+// DrawIO Source Config
 
 const params = {
     embed: 1,
@@ -24,6 +41,16 @@ const params_processed = computed(() =>
         .join("&")
 );
 
+// Functions
+const setXML = (xml: string) => {
+    post({ action: "load", autosave: !noAutosave, xml });
+};
+
+// Loading
+const loaded = ref(false);
+
+// Iframe
+
 const frame = ref<InstanceType<typeof HTMLIFrameElement>>();
 
 const post = (msg: any) => {
@@ -32,7 +59,7 @@ const post = (msg: any) => {
 };
 
 interface DrawIOMsg {
-    event: "init" | "export" | "autosave" | "save" | "exit";
+    event: "init" | "export" | "autosave" | "save" | "exit" | "load";
     xml?: string;
 }
 
@@ -43,12 +70,21 @@ const receive = (evt: MessageEvent) => {
 
     switch (msg.event) {
         case "init":
-            post({ action: "load", autosave: 1, xml: class_default });
-            emit("loaded");
+            setXML(model.value);
+            set(loaded, false);
+            break;
         case "save":
-            console.log(msg);
+            model.value = msg.xml || "";
+            emit("save", msg.xml || "");
+            break;
+        case "load":
+            set(loaded, true);
+            emit("loaded");
+            break;
     }
 };
+
+// Iframe event binding
 
 onMounted(() => {
     window.addEventListener("message", receive);
@@ -57,10 +93,24 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener("message", receive);
 });
+
+watch(model, (xml) => setXML(xml));
 </script>
 
 <template>
-    <Fill>
+    <Fill class="relative">
+        <div
+            v-if="!loaded"
+            class="absolute z-10 w-full h-full flex justify-center items-center bg-primary"
+        >
+            <Loading data="Loading DrawIO UI" />
+        </div>
+        <div
+            v-else-if="saving"
+            class="absolute z-10 w-full h-full flex justify-center items-center bg-primary opacity-60"
+        >
+            <Loading data="Saving Data" />
+        </div>
         <iframe
             :allowtransparency="true"
             ref="frame"

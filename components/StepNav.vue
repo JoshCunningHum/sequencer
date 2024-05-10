@@ -19,6 +19,17 @@ const {
     disabled?: boolean;
 }>();
 
+// Slot Definitions
+const slots = defineSlots<{
+    item(props: { step: Step | string; index: number; click: () => void }): any;
+}>();
+
+// click handler for slotted item
+const onClick = (index: number) => {
+    if (noCurrent) return;
+    current.value = index;
+};
+
 // Handles highlighting
 const current = defineModel<number>({ default: -1 });
 
@@ -64,25 +75,57 @@ const stepLineHeight = ref(0);
 onMounted(() => {
     if (container.value) stepLineHeight.value = container.value.clientHeight;
 });
+
+const pad = "2rem";
 </script>
 
 <template>
-    <div class="p-3 relative">
+    <div class="relative h-fit">
         <div
-            class="absolute w-1 bg-secondary top-[1rem] left-[50%]"
-            :style="{ height: `calc(${stepLineHeight}px - 1rem)` }"
+            :class="`absolute ${
+                // Width
+                orientation === 'vertical' ? 'w-1 h-[80%]' : 'w-[80%] h-1'
+            } bg-secondary ${
+                // translation
+                orientation === 'vertical'
+                    ? '-translate-x-0.5'
+                    : '-translate-y-0.5'
+            }`"
+            :style="{
+                // height
+                height:
+                    orientation === 'vertical' ? `calc(100% - ${pad})` : '4px',
+                // width
+                width:
+                    orientation === 'horizontal'
+                        ? `calc(100% - ${pad})`
+                        : '4px',
+                // positioning
+                top: orientation === 'vertical' ? `calc(${pad} / 2)` : '50%',
+                left: orientation === 'horizontal' ? `calc(${pad} / 2)` : '50%',
+            }"
         ></div>
         <div
             :class="[orientation === 'vertical' ? 'flex flex-col' : 'flex']"
             class="gap-3"
             ref="container"
         >
-            <Step
+            <template
                 v-for="(step, i) in steps"
-                :value="step"
-                :index="i"
                 :key="i"
-            />
+            >
+                <slot
+                    name="item"
+                    :step="step"
+                    :click="() => onClick(i)"
+                    :index="i"
+                >
+                    <Step
+                        :value="step"
+                        :index="i"
+                    />
+                </slot>
+            </template>
         </div>
     </div>
 </template>
