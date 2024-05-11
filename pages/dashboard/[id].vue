@@ -134,7 +134,7 @@ const xml = computed<string>({
                 <DevToggle />
             </div>
 
-            <!--Body -->
+            <!--Diagrams  -->
             <ForcedPreloader
                 v-slot="{ done }"
                 :show="step === 0"
@@ -148,6 +148,12 @@ const xml = computed<string>({
                     v-show="step === 0"
                 />
             </ForcedPreloader>
+
+            <!-- Confirmation -->
+            <div v-show="steps[step] === 'Confirmation'">Confirming</div>
+
+            <!-- Generate -->
+            <div v-show="steps[step] === 'Generate'">Generating</div>
         </Fill>
     </Fill>
 </template>

@@ -25,7 +25,7 @@ const descriptiontxt = computed(() =>
             >
                 Generate sequence diagram from your class and use case diagrams
                 <br />
-                with the power of <span class="text-primary">AI</span>
+                with the power of <span class="text-accent">AI</span>
             </div>
             <div v-else>
                 {{ descriptiontxt }}
