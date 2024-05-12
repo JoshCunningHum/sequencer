@@ -1,10 +1,7 @@
-<script lang="ts">
-export const class_default = useDrawIOClassDefault();
-export const usecase_default = useDrawIOUseCaseDefault();
-</script>
-
 <script lang="ts" setup>
 import { set } from "@vueuse/core";
+import { usecase_default } from "../models/UseCaseDiagramData";
+import { class_default } from "../models/ClassDiagramData";
 
 // Props and Emits
 const { noAutosave = false, saving = false } = defineProps<{

@@ -2,13 +2,14 @@
 import { useRoute } from "../../.nuxt/typed-router/__useTypedRoute";
 import { useProjectsStore } from "../../stores/projects";
 import { type Project } from "../../types";
-import {
-    class_default,
-    usecase_default,
-} from "../../components/DrawIOEmbed.vue";
 import { get, set } from "@vueuse/core";
 import { useRouteParams } from "@vueuse/router";
 import { useDevStore } from "../../stores/dev";
+import { ClassDiagramData } from "../../models/ClassDiagramData";
+import { UseCaseDiagramData } from "../../models/UseCaseDiagramData";
+import { usecase_default } from "../../models/UseCaseDiagramData";
+import { class_default } from "../../models/ClassDiagramData";
+import { useGenerationStore } from "../../stores/generation";
 
 // Dev Mode
 const devStore = useDevStore();
@@ -53,27 +54,38 @@ const disable_menu = ref(false);
 // XML and saving
 const isSaving = ref(false);
 
+const onSave = async (xml: string) => {
+    if (get(isSaving)) return;
+    set(isSaving, true);
+
+    const diag = get(diagram);
+
+    const proj = Object.assign({}, project.value);
+
+    if (diag === diagrams[0]) proj.class = xml;
+    else proj.usecase = xml;
+
+    await projectStore.update(proj);
+
+    set(isSaving, false);
+};
+
 const xml = computed<string>({
     get: () => {
         const diag = get(diagram);
         if (diag === diagrams[0]) return project.value?.class || class_default;
         return project.value?.usecase || usecase_default;
     },
-    set: (xml: string) => {
-        if (get(isSaving)) return;
-        set(isSaving, true);
+    set: onSave,
+});
 
-        const diag = get(diagram);
+// Data Preperation for Generation
+const generateStore = useGenerationStore();
+const prepare = generateStore.prepare;
+const {} = storeToRefs(generateStore);
 
-        const proj = Object.assign({}, project.value);
-
-        if (diag === diagrams[0]) proj.class = xml;
-        else proj.usecase = xml;
-
-        projectStore.update(proj).then(() => {
-            set(isSaving, false);
-        });
-    },
+watchImmediate(xml, () => {
+    if (project.value) prepare(project.value);
 });
 </script>
 
@@ -113,21 +125,20 @@ const xml = computed<string>({
                                 v-model="diagram"
                             />
                         </UButtonGroup>
-                        <UChip
+                        <UButton
                             v-else
-                            :show="s === 'Confirmation'"
-                            class="z-10"
-                            size="lg"
-                            inset
-                            color="red"
-                            text="DEV"
-                        >
-                            <UButton
-                                @click="click()"
-                                :color="step === index ? 'primary' : 'gray'"
-                                >{{ s }}</UButton
-                            >
-                        </UChip>
+                            @click="click()"
+                            class="z-10 DMSans"
+                            :color="step === index ? 'primary' : 'gray'"
+                            >{{ s }}
+                            <UBadge
+                                v-if="s === 'Confirmation'"
+                                size="xs"
+                                color="red"
+                                label="DEV"
+                                :variant="step === index ? 'solid' : 'subtle'"
+                            />
+                        </UButton>
                     </template>
                 </StepNav>
 
@@ -150,7 +161,7 @@ const xml = computed<string>({
             </ForcedPreloader>
 
             <!-- Confirmation -->
-            <div v-show="steps[step] === 'Confirmation'">Confirming</div>
+            <Confirmation v-show="steps[step] === 'Confirmation'" />
 
             <!-- Generate -->
             <div v-show="steps[step] === 'Generate'">Generating</div>

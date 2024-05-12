@@ -1,11 +1,12 @@
 import { DrawIOXML } from "./DrawIOXML";
 
-export class UseCaseDiagramData extends DrawIOXML {
+export const usecase_default = useDrawIOUseCaseDefault();
 
+export class UseCaseDiagramData extends DrawIOXML {
     public actors: string[] = [];
     public useCases: UseCaseData[] = [];
 
-    constructor(xml: string){
+    constructor(xml: string) {
         super(xml);
     }
 
@@ -15,7 +16,6 @@ export class UseCaseDiagramData extends DrawIOXML {
     process(): void {
         throw new Error("Method not implemented.");
     }
-    
 }
 
 export class UseCaseData {
@@ -24,12 +24,12 @@ export class UseCaseData {
 
     constructor(from: UseCaseData | string, type?: UseCaseType) {
         this.from = from;
-        if(type) this.type = type;
+        if (type) this.type = type;
     }
 }
 
 export enum UseCaseType {
     Default,
     Include,
-    Extends
+    Extends,
 }

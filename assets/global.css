@@ -27,3 +27,8 @@
         clip-path: inset(0 0 0 0);
     }
 }
+
+/* Fix for non-aligning icon in xml viewer */
+svg {
+    display: unset !important;
+}

@@ -6,16 +6,16 @@ export enum GenerationStatus {
     Idle,
     PromptGenerate,
     ResultPending,
-    AnalyzeResult
+    AnalyzeResult,
 }
 
-export class GenerationController{
+export class GenerationController {
     drawIOClass: ClassDiagramData;
     drawIOUseCase: UseCaseDiagramData;
     drawIOSequence: SequenceDiagramData;
+    status: GenerationStatus = GenerationStatus.Idle;
 
-
-    constructor(){
+    constructor() {
         const defclass = useDrawIOClassDefault();
         const defusecase = useDrawIOUseCaseDefault();
 
@@ -24,7 +24,7 @@ export class GenerationController{
         this.drawIOSequence = new SequenceDiagramData();
     }
 
-    async generateSequenceDiagram() : Promise<string> {
+    async generateSequenceDiagram(): Promise<string> {
         const { drawIOClass: cl, drawIOUseCase: uc, drawIOSequence: sq } = this;
 
         // Generate Prompt

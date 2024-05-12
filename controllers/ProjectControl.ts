@@ -1,3 +1,5 @@
+import { ClassDiagramData } from "~/models/ClassDiagramData";
+import { UseCaseDiagramData } from "~/models/UseCaseDiagramData";
 import type { Project } from "~/types";
 
 export class ProjectController {

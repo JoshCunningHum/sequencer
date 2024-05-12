@@ -19,12 +19,14 @@
         "@pinia/nuxt": "^0.5.1",
         "@vueuse/nuxt": "^10.9.0",
         "@vueuse/router": "^10.9.0",
+        "json-editor-vue": "^0.15.1",
         "nuxt": "^3.11.2",
         "nuxt-typed-router": "^3.6.3",
         "pinia": "^2.1.7",
         "sass": "^1.76.0",
         "vue": "^3.4.21",
         "vue-router": "^4.3.0",
+        "vue3-xml-viewer": "^0.0.14",
         "xml-js": "^1.6.11",
         "yup": "^1.4.0"
     }
