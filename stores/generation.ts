@@ -54,7 +54,10 @@ export const useGenerationStore = defineStore("Generation", () => {
         const data = new UseCaseDiagramData(get(usecasexml));
         set(usecasejson, data.toJSON());
 
-        set(usecasedata, new UseCaseDiagramData(get(usecasexml)));
+        data.process();
+        set(usecasedata, data);
+
+        set(usecaseprompt, data.toPrompt());
 
         states.usecase = false;
     };

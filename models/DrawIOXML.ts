@@ -117,6 +117,8 @@ export type DIOMxCell = XMLNode & {
         value?: string;
         style?: string;
         vertext?: number;
+        source?: number;
+        target?: number;
     } & Record<string, string | number | boolean>;
     elements: DIOMxGeometry[];
 };

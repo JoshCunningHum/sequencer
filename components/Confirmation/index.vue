@@ -15,6 +15,10 @@ const {
     states,
 } = storeToRefs(generateStore);
 
+const usecase_list = computed(() =>
+    usecasedata.value.systems.flatMap((s) => s.data)
+);
+
 const isClassDone = computed(() => states.value.class);
 const isUsecaseDone = computed(() => states.value.usecase);
 
@@ -158,6 +162,28 @@ const itemformat = [
                     <template #json>
                         <ConfirmationListItem v-if="usecasejson">
                             <ObjectViewer :obj="usecasejson" />
+                        </ConfirmationListItem>
+                    </template>
+
+                    <!-- Data -->
+                    <template #data>
+                        <ConfirmationUseCase
+                            v-for="(u, i) in usecase_list"
+                            :data="u"
+                            :key="i"
+                        />
+                    </template>
+
+                    <!-- Prompt -->
+                    <template #prompt>
+                        <ConfirmationListItem>
+                            <Copier :text="usecaseprompt">
+                                <pre
+                                    class="overflow-auto p-1 px-2"
+                                    v-if="usecaseprompt"
+                                    >{{ usecaseprompt }}</pre
+                                >
+                            </Copier>
                         </ConfirmationListItem>
                     </template>
                 </UAccordion>

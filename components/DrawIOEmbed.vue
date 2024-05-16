@@ -71,6 +71,7 @@ const receive = (evt: MessageEvent) => {
             set(loaded, false);
             break;
         case "save":
+            console.log(`%cSaving...`, "color: orange");
             model.value = msg.xml || "";
             emit("save", msg.xml || "");
             break;

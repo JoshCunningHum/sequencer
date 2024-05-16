@@ -50,6 +50,7 @@ export class ClassDiagramData extends DrawIOXML {
         const classes = cells.filter((cell) => isClass(cell, cells));
 
         // Loop through the classes and add them to class data along with their fields
+        this.classes.splice(0);
         classes.forEach((c) => {
             const children = findChildren(c, cells);
             const fields = children.filter((child) => isField(child, [c]));

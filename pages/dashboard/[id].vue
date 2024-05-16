@@ -51,6 +51,10 @@ const diagram = ref(diagrams[0]);
 // Preloading DRAWIO Iframe
 const disable_menu = ref(false);
 
+// Data Preperation for Generation
+const generateStore = useGenerationStore();
+const prepare = generateStore.prepare;
+
 // XML and saving
 const isSaving = ref(false);
 
@@ -68,6 +72,8 @@ const onSave = async (xml: string) => {
     await projectStore.update(proj);
 
     set(isSaving, false);
+
+    prepare(proj);
 };
 
 const xml = computed<string>({
@@ -76,17 +82,11 @@ const xml = computed<string>({
         if (diag === diagrams[0]) return project.value?.class || class_default;
         return project.value?.usecase || usecase_default;
     },
-    set: onSave,
+    set: (str: string) => 0,
 });
 
-// Data Preperation for Generation
-const generateStore = useGenerationStore();
-const prepare = generateStore.prepare;
-const {} = storeToRefs(generateStore);
-
-watchImmediate(xml, () => {
-    if (project.value) prepare(project.value);
-});
+// Mount actions
+onMounted(() => project.value && prepare(project.value));
 </script>
 
 <template>
@@ -155,13 +155,14 @@ watchImmediate(xml, () => {
                 <DrawIOEmbed
                     @loaded="done"
                     v-model="xml"
+                    @save="onSave"
                     :saving="isSaving"
                     v-show="step === 0"
                 />
             </ForcedPreloader>
 
             <!-- Confirmation -->
-            <Confirmation v-show="steps[step] === 'Confirmation'" />
+            <LazyConfirmation v-show="steps[step] === 'Confirmation'" />
 
             <!-- Generate -->
             <div v-show="steps[step] === 'Generate'">Generating</div>
