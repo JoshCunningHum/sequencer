@@ -25,7 +25,7 @@ export class UseCaseDiagramData extends DrawIOXML {
     toPrompt(): string {
         const countStepGroups = (input: string) => {
             let skip = 0;
-            return input.split(",").reduce((groups, c, i) => {
+            return input.split("").reduce((groups, c, i) => {
                 if (skip > 0) {
                     skip--;
                     return groups;
@@ -49,50 +49,81 @@ export class UseCaseDiagramData extends DrawIOXML {
             }, 0);
         };
 
+        const appendStep = (step: string, increment = 1) => {
+            const matches = step.match(/([^a-z]?[0-9]+|[^0-9]?[a-z]+)$/i);
+            if (!matches) return step;
+
+            const s = matches[0];
+            const rest = step.slice(0, -s.length);
+            const isNumber = !isNaN(Number(s));
+            const current_step = isNumber
+                ? rest + String(Number(s) + increment)
+                : rest + appendStringOrdinal(s, increment);
+
+            return current_step;
+        };
+
         const traverse = (
             u: UseCaseData,
             cb: (
                 u: UseCaseData,
                 step: string,
                 level: number,
+                category: "include" | "extend",
                 type: "include" | "extend"
             ) => void,
             step = "1"
         ) => {
-            type QueueItem = [UseCaseData, string, "include" | "extend"];
+            type QueueItem = [
+                UseCaseData,
+                string,
+                "include" | "extend",
+                "include" | "extend",
+                "include" | "extend",
+            ];
 
             // Do the breadfirst approach
-            const queue: QueueItem[] = [[u, step, "include"]];
+            const stack: QueueItem[] = [
+                [u, step, "include", "include", "include"],
+            ];
+            const visited: QueueItem[] = [];
 
-            while (queue.length) {
-                const [curr, step, type] = queue.shift() as QueueItem;
+            while (stack.length) {
+                const [curr, step, category, type, prev] =
+                    stack.pop() as QueueItem;
 
                 // Get the step
-                const matches = step.match(/([^a-z]?[0-9]+|[^0-9]?[a-z]+)$/i);
+                const matches = step.match(
+                    /([^a-z]?[0-9\-]+|[^0-9]?[a-z\-]+)$/i
+                );
                 if (!matches) continue;
 
                 const s = matches[0];
+                const rest = step.slice(0, -s.length);
                 const isNumber = !isNaN(Number(s));
                 const current_step = isNumber
-                    ? String(Number(s) + 1)
-                    : appendStringOrdinal(s);
-                const alt_step = isNumber ? s + "a" : s + "1";
+                    ? rest + String(Number(s) + 1)
+                    : rest + appendStringOrdinal(s);
+                const alt_step = isNumber ? step + "a" : step + "1";
                 const level = countStepGroups(current_step);
 
+                console.log(current_step, level);
+
                 // Add the includes in the qeueue
-                curr.incl.forEach((u) => {
-                    const nstep =
-                        curr.incl.length > 1 ? alt_step : current_step;
-                    queue.push([u, nstep, type]);
+                curr.incl.forEach((u, i) => {
+                    const nstep = type === "extend" ? alt_step : current_step;
+                    stack.push([u, nstep, category, "include", type]);
                 });
 
                 // Then add the extended
                 curr.exts.forEach((u) => {
-                    queue.push([u, alt_step, "extend"]);
+                    stack.push([u, alt_step, "extend", "extend", type]);
                 });
 
                 // Call the callback
-                cb(curr, step, level, type);
+                cb(curr, step, level, category, type);
+
+                visited.push([u, step, category, type, prev]);
             }
         };
 
@@ -105,28 +136,32 @@ export class UseCaseDiagramData extends DrawIOXML {
                 const usecases = data.map((u, i) => {
                     const title = `(${u.value})`;
 
-                    console.log(
-                        `%cProcessing Usecase: ${i + 1}`,
-                        "color:orange"
-                    );
+                    // console.log(
+                    //     `%cProcessing Usecase: ${i + 1}`,
+                    //     "color:orange"
+                    // );
 
                     let stpstr = `\tSteps:\n`;
                     let extstr = `\tExtensions:\n`;
                     let hasext = false;
                     const actors = new Set<string>();
 
-                    traverse(u, (curr, step, lvl, type) => {
+                    traverse(u, (curr, step, lvl, category, type) => {
                         const { involves, value } = curr;
 
-                        console.log(`\t%c<<${type}>>: ${value}`, "color:green");
-
+                        // console.log(
+                        //     `\t%c<<${category}>>: ${value}`,
+                        //     "color:green"
+                        // );
                         // Get actors involved in this usecase
                         involves.forEach((a) => actors.add(a));
 
-                        const padd = "\t".repeat(lvl + 1);
+                        const padd = "\t".repeat(
+                            lvl + (category === "include" ? 1 : 0)
+                        );
                         const item = `${padd}${step}. ${value} ${involves.length ? `(${involves.join(", ")})` : ""}`;
 
-                        switch (type) {
+                        switch (category) {
                             case "extend":
                                 hasext = true;
                                 extstr += item;
