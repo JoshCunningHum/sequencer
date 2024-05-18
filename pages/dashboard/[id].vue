@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import { get, set } from "@vueuse/core";
 import { useRoute } from "../../.nuxt/typed-router/__useTypedRoute";
+import { class_default } from "../../models/ClassDiagramData";
+import { usecase_default } from "../../models/UseCaseDiagramData";
+import { useDevStore } from "../../stores/dev";
+import { useGenerationStore } from "../../stores/generation";
 import { useProjectsStore } from "../../stores/projects";
 import { type Project } from "../../types";
-import { get, set } from "@vueuse/core";
-import { useRouteParams } from "@vueuse/router";
-import { useDevStore } from "../../stores/dev";
-import { ClassDiagramData } from "../../models/ClassDiagramData";
-import { UseCaseDiagramData } from "../../models/UseCaseDiagramData";
-import { usecase_default } from "../../models/UseCaseDiagramData";
-import { class_default } from "../../models/ClassDiagramData";
-import { useGenerationStore } from "../../stores/generation";
 
 // Dev Mode
 const devStore = useDevStore();
@@ -165,7 +162,7 @@ onMounted(() => project.value && prepare(project.value));
             <LazyConfirmation v-show="steps[step] === 'Confirmation'" />
 
             <!-- Generate -->
-            <div v-show="steps[step] === 'Generate'">Generating</div>
+            <LazyGenerate v-show="steps[step] === 'Generate'" />
         </Fill>
     </Fill>
 </template>

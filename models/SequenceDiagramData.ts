@@ -2,57 +2,49 @@ export enum SequenceProcessErrror {
     InvalidJSON = "Invalid JSON",
     InvalidBlock = "Invalid Block",
     InvalidAction = "Invalid Action",
-    InvalidActor = "Invalid Actor"
+    InvalidActor = "Invalid Actor",
 }
 
 export class SequenceDiagramData {
-
+    public title: string = "";
     public actors: string[] = [];
-    public data: (Block| Action)[] = [];
+    public elements: SequenceElement[] = [];
 
-    process(data: string) : string {
-        // Parse the data to JSON, throw an error if the returned data is not a json
-        let json;
+    process(data: string): string {
+        // Parse the said string
+        const lines = data.trim().split("\n");
 
-        try {
-            json = JSON.parse(data);
-        }catch(e) {
-            throw new Error(SequenceProcessErrror.InvalidJSON);
+        let currentblock: Block | null = null;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
         }
 
         return data;
     }
 }
 
-interface ActionArgs {
-    from: string;
-    to: string;
-    value: string;
-    isAsync?: boolean;
+export type SequenceElement = Message | Block | Note;
+
+export interface Actor {
+    name: string;
 }
 
-export class Action {
-    public from: string;
-    public to: string;
-    public value: string;
-    public isAsync: boolean = false;
-
-    constructor({ from, to, value, isAsync = false } : ActionArgs) {
-        this.from = from;
-        this.to = to;
-        this.value = value;
-        this.isAsync = isAsync;
-    }
-
+export interface Message {
+    type: "sync" | "async" | "reply";
+    sender: string;
+    receiver: string;
+    content: string;
 }
 
-export enum BlockType {
-    Regular,
-    Alt,
-    Opt
+export interface Block {
+    type: "alt" | "opt" | "par" | "loop" | "block";
+    elements: SequenceElement[];
+    conditions: string[]; // for 'alt' blocks
+    parent?: Block; // for nested blocks
 }
 
-export class Block {
-    public data: (Block | Action)[] = [];
-    type: BlockType = BlockType.Regular;
+export interface Note {
+    text: string;
+    target: SequenceElement; // element this note is attached to
 }

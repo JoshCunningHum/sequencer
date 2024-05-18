@@ -34,13 +34,13 @@ const itemformat = [
         label: "JSON",
         icon: "i-mdi-json",
         slot: "json",
-        defaultOpen: true,
+        defaultOpen: false,
     },
     {
         label: "Data",
         icon: "i-mdi-data",
         slot: "data",
-        defaultOpen: true,
+        defaultOpen: false,
     },
     {
         label: "Prompt",

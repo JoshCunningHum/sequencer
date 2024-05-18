@@ -5,6 +5,7 @@ import { usecase_default } from "../models/UseCaseDiagramData";
 import { class_default } from "../models/ClassDiagramData";
 import { UseCaseDiagramData } from "~/models/UseCaseDiagramData";
 import { set, get } from "@vueuse/core";
+import { SequenceDiagramData } from "~/models/SequenceDiagramData";
 
 export const useGenerationStore = defineStore("Generation", () => {
     //#region State
@@ -13,12 +14,14 @@ export const useGenerationStore = defineStore("Generation", () => {
         preparing: false,
         class: false,
         usecase: false,
+        sequence: false,
     });
 
     //#region Data
 
     const classxml = ref<string>("");
     const usecasexml = ref<string>("");
+    const sequencexml = ref<string>("");
 
     const classdata = ref<ClassDiagramData>(
         new ClassDiagramData(class_default)
@@ -26,12 +29,15 @@ export const useGenerationStore = defineStore("Generation", () => {
     const usecasedata = ref<UseCaseDiagramData>(
         new UseCaseDiagramData(usecase_default)
     );
+    const sequencedata = ref<SequenceDiagramData>(new SequenceDiagramData());
 
     const classjson = ref<Record<string, any>>({});
     const usecasejson = ref<Record<string, any>>({});
+    // const sequencejson = ref<Record<string, any>>({});
 
     const classprompt = ref<string>("");
     const usecaseprompt = ref<string>("");
+    const sequenceprompt = ref<string>("");
 
     //#region Preperations
 
@@ -62,14 +68,31 @@ export const useGenerationStore = defineStore("Generation", () => {
         states.usecase = false;
     };
 
+    const preparesequence = async (p: Project) => {
+        const { sequence: datatxt } = p;
+        if (!datatxt) return;
+
+        const data = new SequenceDiagramData();
+
+        // process json and create sequence data for dev-view
+        const xml = data.process(datatxt);
+
+        set(sequencexml, xml);
+        set(sequencedata, data);
+
+        states.sequence = false;
+    };
+
     const prepare = async (p: Project) => {
         states.preparing = true;
         states.class = true;
         states.usecase = true;
+        states.sequence = true;
 
         await Promise.all([
             new Promise(async () => prepareclass(p)),
             new Promise(async () => prepareusecase(p)),
+            new Promise(async () => preparesequence(p)),
         ]);
 
         states.preparing = false;
@@ -88,5 +111,9 @@ export const useGenerationStore = defineStore("Generation", () => {
         usecasedata,
         usecasejson,
         usecaseprompt,
+
+        sequencexml,
+        sequenceprompt,
+        sequencedata,
     };
 });

@@ -16,6 +16,7 @@ export type Database = {
           id: number
           modified_at: string
           name: string
+          sequence: string | null
           usecase: string | null
         }
         Insert: {
@@ -24,6 +25,7 @@ export type Database = {
           id?: number
           modified_at?: string
           name: string
+          sequence?: string | null
           usecase?: string | null
         }
         Update: {
@@ -32,6 +34,7 @@ export type Database = {
           id?: number
           modified_at?: string
           name?: string
+          sequence?: string | null
           usecase?: string | null
         }
         Relationships: [
