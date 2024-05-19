@@ -1,4 +1,5 @@
 import type {
+    Activation,
     Block,
     Message,
     SequenceElement,
@@ -9,7 +10,11 @@ export const getline = (str: string, index: number) => {
 };
 
 const isparticipantline = (line: string) => {
-    return !line.match(/(\-?\->|alt|opt|par\s|loop|block|end|else|\|\|)/gi);
+    if (!line) return false;
+    return (
+        !line.match(/(\-?\->|alt|opt|par\s|loop|block|end|else|\|\|)/gi) &&
+        !!line.match(/[a-z0-9]+/gi)
+    );
 };
 
 export const parse = (
@@ -17,16 +22,28 @@ export const parse = (
 ): { actors: string[]; title: string; elements: SequenceElement[] } => {
     const lines = str.split("\n");
 
-    console.log(`%c----Starting parsing----`, "color:cyan");
-
     let title = "";
     const actors: string[] = [];
     const elements: SequenceElement[] = [];
 
     let currentblock: Block | null = null;
 
+    let lastelement: SequenceElement | null = null;
+
+    const activations: Activation[] = [];
+
+    let PREVENTLOOP = str.length * 2;
+
     for (let i = 0; i < str.length; i++) {
         const slice = str.slice(i);
+
+        PREVENTLOOP--;
+
+        if (PREVENTLOOP <= 0) {
+            throw new Error(
+                `Infinite Loop Detected. This is a code error and not a user error`
+            );
+        }
 
         const whitespacematch = slice.match(/^\s+/);
         const titlematch = slice.match(/^Sequence:\s*[a-z]+\n/i);
@@ -40,6 +57,7 @@ export const parse = (
         const endblock = slice.match(/^[ \t]*end/i);
         const elseblock = slice.match(/^[ \t]*else([ ]+[a-z0-9]*)?\n/i);
         const paritem = slice.match(/^\|\|/i);
+        const acts = slice.match(/^[ \t]*(de)?activate[ ]*[a-z0-9]+/i);
 
         if (whitespacematch) {
             // Whitespaces
@@ -51,13 +69,20 @@ export const parse = (
             i += match.length - 1;
             title = match.split(":")[1].trim();
             continue;
-        } else if (participantsmatch) {
+        } else if (participantsmatch && !acts) {
             // Participants
             i += participantsmatch[0].length;
             do {
                 const line = lines[getline(str, i)];
                 const participantline = isparticipantline(line);
                 if (!participantline) break;
+
+                PREVENTLOOP--;
+                if (PREVENTLOOP <= 0) {
+                    throw new Error(
+                        `Infinite Loop Detected in Participant Check`
+                    );
+                }
 
                 const extracted_actors = line
                     .split(/[\s\n\t]+/gm)
@@ -68,7 +93,6 @@ export const parse = (
 
                 i += line.length;
             } while (true);
-            i--;
         } else if (messagematch) {
             // Messages
             const [match] = messagematch;
@@ -90,11 +114,11 @@ export const parse = (
                 elements.push(message);
             }
 
+            lastelement = message;
+
             i += match.length - 1;
         } else if (blockmatch) {
             const [type, condition] = blockmatch[0].trim().split(/\s+/);
-
-            console.log(`%cEncountered block ${type}`, "color:amber");
 
             const block: Block = {
                 type: type as Block["type"],
@@ -138,11 +162,7 @@ export const parse = (
                     throw new Error(`Condition block with no alt parent block`);
 
                 curr.parent.conditions.push(condition);
-                console.log(curr.parent.conditions);
 
-                console.log(
-                    `Adding a new condition to alt block: ${condition}`
-                );
                 if (curr.type === "block") {
                     const elseblock: Block = {
                         type: "block",
@@ -183,6 +203,8 @@ export const parse = (
             i += match.length - 1;
         } else if (endblock) {
             if (currentblock) {
+                const [match] = endblock;
+                i += match.length - 1;
                 const block = currentblock as Block;
 
                 if (block.parent) {
@@ -196,13 +218,7 @@ export const parse = (
                         case "block":
                             const parent = block.parent as Block;
 
-                            console.log(
-                                `%cEnding block ${parent.type}`,
-                                "color:amber"
-                            );
-
                             if (parent.parent) {
-                                console.log(`<< Back to ${parent.parent.type}`);
                                 currentblock = parent.parent;
                             } else {
                                 elements.push(parent);
@@ -211,10 +227,6 @@ export const parse = (
                             break;
                         case "loop":
                         case "opt":
-                            console.log(
-                                `%cEnding block ${block.type}`,
-                                "color:amber"
-                            );
                             currentblock = block.parent;
                             break;
                     }
@@ -223,7 +235,48 @@ export const parse = (
                     currentblock = null;
                 }
             } else throw new Error(`End block with no starting block`);
-            const [match] = endblock;
+        } else if (acts) {
+            const [match] = acts;
+            const [command, actor] = match.trim().split(/\s+/);
+            const isactivate = command === "activate";
+            const existing_participant = actors.includes(actor);
+
+            const last_activation_index = activations.findIndex(
+                (a) => a.actor === actor
+            );
+            const last_activation =
+                last_activation_index === -1
+                    ? undefined
+                    : activations[last_activation_index];
+
+            if (existing_participant && lastelement) {
+                if (isactivate) {
+                    if (last_activation)
+                        throw new Error(
+                            `Activation of actor[${actor}] is activated without de-activation of a previous one`
+                        );
+
+                    const activation: Activation = {
+                        actor,
+                        start: lastelement,
+                    };
+                    activations.push(activation);
+                    elements.push(activation);
+                } else {
+                    if (!last_activation)
+                        throw new Error(
+                            `De-activation of actor[${actor}] occured without activating`
+                        );
+                    last_activation.end = lastelement;
+                    activations.splice(last_activation_index, 1);
+                }
+            } else if (lastelement)
+                throw new Error(`Activation but no actor is found: ${actor}`);
+            else
+                throw new Error(
+                    `Activation but no message happened yet: ${match}`
+                );
+
             i += match.length - 1;
         }
     }

@@ -1,13 +1,14 @@
 import { expect, test } from "vitest";
 import {
     SequenceDiagramData,
+    type Activation,
     type Block,
     type Message,
     type SequenceElement,
 } from "../../models/SequenceDiagramData";
 import { getline, parse } from "./parser";
 
-test("Payment Example", () => {
+test("Payment Example", async () => {
     const altpayment = <Block>{
         type: "alt",
         conditions: ["PaymentSuccessful", "PaymentFailed"],
@@ -55,7 +56,6 @@ test("Payment Example", () => {
     };
 
     altpayment.elements.push(condpaymentsuccess, condpaymentfailed);
-
     expect(
         parse(`Sequence: PlaceOrder
     Participants:
@@ -109,7 +109,7 @@ test("Payment Example", () => {
     });
 });
 
-test("Nested Example", () => {
+test("Nested Example", async () => {
     const alt = <Block>{
         type: "alt",
         elements: [],
@@ -229,7 +229,6 @@ else Condition2
 end
 
 A --> B: Message7`);
-
     expect(output).toStrictEqual(<SequenceDiagramData>{
         title: "NestedExample",
         actors: ["A", "B", "C"],
@@ -253,3 +252,121 @@ A --> B: Message7`);
         ],
     });
 });
+
+test("Activation Example", async () => {
+    const output = parse(`Sequence: ActivationExample
+Participants:
+    A B C
+
+A -> B: Message1
+activate B
+B -> C: Message2
+C --> B: Message3
+deactivate B
+
+A -> B: Message4
+activate B
+B --> C: Message5
+activate C
+C --> B: Message6
+deactivate C
+B --> A: Message7
+deactivate B`);
+
+    const data = {
+        elements: <SequenceElement[]>[],
+        actors: ["A", "B", "C"],
+        title: "ActivationExample",
+    };
+
+    const msg1 = <Message>{
+        content: "Message1",
+        type: "sync",
+        sender: "A",
+        receiver: "B",
+    };
+
+    const msg2 = <Message>{
+        content: "Message2",
+        type: "sync",
+        sender: "B",
+        receiver: "C",
+    };
+
+    const msg3 = <Message>{
+        content: "Message3",
+        type: "async",
+        sender: "C",
+        receiver: "B",
+    };
+
+    const act1 = <Activation>{
+        actor: "B",
+        start: msg1,
+        end: msg3,
+    };
+
+    const msg4 = <Message>{
+        content: "Message4",
+        type: "sync",
+        sender: "A",
+        receiver: "B",
+    };
+
+    const msg5 = <Message>{
+        content: "Message5",
+        type: "async",
+        sender: "B",
+        receiver: "C",
+    };
+
+    const msg6 = <Message>{
+        content: "Message6",
+        type: "async",
+        sender: "C",
+        receiver: "B",
+    };
+
+    const msg7 = <Message>{
+        content: "Message7",
+        type: "async",
+        sender: "B",
+        receiver: "A",
+    };
+
+    const act2 = <Activation>{
+        actor: "B",
+        start: msg4,
+        end: msg7,
+    };
+
+    const act3 = <Activation>{
+        actor: "C",
+        start: msg5,
+        end: msg6,
+    };
+
+    data.elements.push(
+        msg1,
+        act1,
+        msg2,
+        msg3,
+        msg4,
+        act2,
+        msg5,
+        act3,
+        msg6,
+        msg7
+    );
+
+    expect(output).toStrictEqual(data);
+});
+
+test("Non-Ending Loop Test", async () => {
+    const output = parse(`Sequence: ActivationExample
+    Participants:
+        A B C
+    `);
+
+    expect(true).toBe(true);
+}, 50);
