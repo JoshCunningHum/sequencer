@@ -6,8 +6,11 @@ import { class_default } from "../models/ClassDiagramData";
 import { UseCaseDiagramData } from "~/models/UseCaseDiagramData";
 import { set, get } from "@vueuse/core";
 import { SequenceDiagramData } from "~/models/SequenceDiagramData";
+import { GenerationController } from "~/controllers/GenerationControl";
 
 export const useGenerationStore = defineStore("Generation", () => {
+    const devStore = useDevStore();
+
     //#region State
 
     const states = reactive({
@@ -33,11 +36,54 @@ export const useGenerationStore = defineStore("Generation", () => {
 
     const classjson = ref<Record<string, any>>({});
     const usecasejson = ref<Record<string, any>>({});
-    // const sequencejson = ref<Record<string, any>>({});
+    const sequencetxt = ref<string>();
 
     const classprompt = ref<string>("");
     const usecaseprompt = ref<string>("");
     const sequenceprompt = ref<string>("");
+    const sequencetestprompt = ref<string>(`Sequence: CodeGenApp
+    Participants:
+        User Server Database LLM API
+    
+      User -> Server: Login(email, password)
+      Server -> Database: CheckCredentials(email, password)
+      Database --> Server: CredentialsValid
+    
+      alt CredentialsValid
+        Server --> User: ShowDashboard
+      else CredentialsInvalid
+        Server --> User: ShowLoginError
+      end
+    
+      User -> Server: Register(email, password, username)
+      Server -> Database: CheckExistingUser(email)
+      Database --> Server: UserExists
+    
+      alt UserExists
+        Server --> User: ShowRegistrationError
+      else !UserExists
+        Server -> Database: CreateUser(email, password, username)
+        Database --> Server: UserCreated
+        Server --> User: ShowLogin
+      end
+    
+      User -> Server: UploadDocument(document)
+      Server -> Database: StoreDocument(document)
+      Database --> Server: DocumentStored
+      Server -> LLM API: ProcessDocument(document)
+      LLM API --> Server: Result
+      Server -> Database: StoreResult(result)
+      Database --> Server: ResultStored
+      Server -> User: ShowResult(result)
+    
+      alt ResultError
+        Server -> User: ShowParsingError
+        alt Back
+          User -> Server: GoBack
+        else Again
+          User -> Server: ReUploadDocument
+        end
+      end`);
 
     //#region Preperations
 
@@ -90,16 +136,64 @@ export const useGenerationStore = defineStore("Generation", () => {
         states.sequence = true;
 
         await Promise.all([
-            new Promise(async () => prepareclass(p)),
-            new Promise(async () => prepareusecase(p)),
-            new Promise(async () => preparesequence(p)),
+            new Promise(async () => await prepareclass(p)),
+            new Promise(async () => await prepareusecase(p)),
+            new Promise(async () => await preparesequence(p)),
+            new Promise(async () => {
+                sequenceprompt.value = useSystemInstructions(
+                    classprompt.value,
+                    usecaseprompt.value
+                );
+            }),
         ]);
 
         states.preparing = false;
     };
 
+    //#endregion
+
+    //#region Generation
+
+    const generate = async () => {
+        // Generate prompt
+        const classdiag = classdata.value;
+        const usecasediag = usecasedata.value;
+        const seqdiag = sequencedata.value;
+
+        const generation = new GenerationController(
+            classdiag,
+            usecasediag,
+            seqdiag
+        );
+
+        console.log(`%c### Generating Sequence ###`, "color:magenta");
+
+        const xml = await (devStore.enabled && sequencetestprompt.value
+            ? seqdiag.process(sequencetestprompt.value)
+            : generation.generateSequenceDiagram());
+
+        console.log(
+            `%cArrived Data: %c${seqdiag.txt}`,
+            "color:green",
+            "color:lightgrey"
+        );
+
+        // Change sequence text
+        set(sequencetxt, seqdiag.txt);
+
+        console.log(
+            `%Resultant XML: %c${xml}`,
+            "color:green",
+            "color:lightgrey"
+        );
+
+        // Change xml ref
+        set(sequencexml, xml);
+    };
+
     return {
         prepare,
+        generate,
         states,
 
         classxml,
@@ -115,5 +209,7 @@ export const useGenerationStore = defineStore("Generation", () => {
         sequencexml,
         sequenceprompt,
         sequencedata,
+        sequencetxt,
+        sequencetestprompt,
     };
 });

@@ -2,6 +2,16 @@
 export default defineNuxtConfig({
     devtools: { enabled: false },
     css: ["~/assets/global.css"],
+    build: {
+        // @ts-expect-error bro trust me
+        extend(config, ctx) {
+            if (ctx.isDev) {
+                config.devtool = ctx.isClient
+                    ? "source-map"
+                    : "inline-source-map";
+            }
+        },
+    },
     modules: [
         "@pinia/nuxt",
         "@vueuse/nuxt",
@@ -12,6 +22,7 @@ export default defineNuxtConfig({
         "@nuxt/fonts",
         "@morev/vue-transitions/nuxt",
         "@morev/vue-transitions/nuxt",
+        "@nuxt/test-utils/module",
     ],
     ui: {
         global: true,

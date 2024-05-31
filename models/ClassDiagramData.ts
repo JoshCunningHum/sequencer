@@ -70,7 +70,7 @@ export class ClassData {
     public properties: string[] = [];
 
     constructor(name: string, properties: string[]) {
-        this.name = name.replace("\n", "").trim(); // remove all new lines
+        this.name = name.replace("\n", "").replace("<>", "").trim(); // remove all new lines
         this.properties = properties;
     }
 }

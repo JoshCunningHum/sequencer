@@ -159,10 +159,26 @@ onMounted(() => project.value && prepare(project.value));
             </ForcedPreloader>
 
             <!-- Confirmation -->
-            <LazyConfirmation v-show="steps[step] === 'Confirmation'" />
+            <ForcedPreloader
+                :show="step === 1"
+                v-slot="{ done }"
+            >
+                <LazyConfirmation
+                    @vue:mounted="done"
+                    v-show="steps[step] === 'Confirmation'"
+                />
+            </ForcedPreloader>
 
             <!-- Generate -->
-            <LazyGenerate v-show="steps[step] === 'Generate'" />
+            <ForcedPreloader
+                :show="step === 2"
+                v-slot="{ done }"
+            >
+                <LazyGenerate
+                    @vue:mounted="done"
+                    v-show="steps[step] === 'Generate'"
+                />
+            </ForcedPreloader>
         </Fill>
     </Fill>
 </template>

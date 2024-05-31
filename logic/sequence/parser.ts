@@ -251,10 +251,12 @@ export const parse = (
 
             if (existing_participant && lastelement) {
                 if (isactivate) {
-                    if (last_activation)
-                        throw new Error(
+                    if (last_activation) {
+                        console.warn(
                             `Activation of actor[${actor}] is activated without de-activation of a previous one`
                         );
+                        continue;
+                    }
 
                     const activation: Activation = {
                         actor,
@@ -270,9 +272,10 @@ export const parse = (
                     last_activation.end = lastelement;
                     activations.splice(last_activation_index, 1);
                 }
-            } else if (lastelement)
-                throw new Error(`Activation but no actor is found: ${actor}`);
-            else
+            } else if (lastelement) {
+                console.warn(`Activation but no actor is found: ${actor}`);
+                continue;
+            } else
                 throw new Error(
                     `Activation but no message happened yet: ${match}`
                 );

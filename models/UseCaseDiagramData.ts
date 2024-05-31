@@ -4,10 +4,11 @@ import isSystem from "~/logic/usecase/isSystem";
 import isUseCase from "~/logic/usecase/isUseCase";
 import isRelationShip from "~/logic/usecase/isRelationShip";
 import getBounds from "~/logic/getBounds";
-import findInGoing from "~/logic/findInGoing";
-import findOutgoing from "~/logic/findOutgoing";
 import getConnects, { type CellConnection } from "~/logic/getConnects";
 import cellByID from "~/logic/cellByID";
+import isBound from "~/logic/isBound";
+
+const DEV = true;
 
 export enum UseCaseProcessError {
     InvalidJSON = "Invalid JSON",
@@ -200,6 +201,7 @@ export class UseCaseDiagramData extends DrawIOXML {
         const actors = cells.filter((c) => isActor(c, cells));
         const systems = cells.filter((c) => isSystem(c, cells));
         const useCases = cells.filter((c) => isUseCase(c, systems));
+        const actors_usecases = actors.concat(useCases);
         const rels = cells.filter((c) =>
             isRelationShip(c, [...useCases, ...systems, ...actors])
         );
@@ -208,21 +210,38 @@ export class UseCaseDiagramData extends DrawIOXML {
             getConnects(a, rels.concat(useCases))
         );
 
+        if (DEV) {
+            console.log(`%c---Actors----`, "color: cyan");
+            console.log(actors);
+
+            console.log(`%c---Systems----`, "color: cyan");
+            console.log(systems);
+
+            console.log(`%c---Use Cases----`, "color: cyan");
+            console.log(useCases);
+
+            console.log(`%c---Rels----`, "color: cyan");
+            console.log(rels);
+        }
+
         const data = systems.map((s) => {
             const { x } = getBounds(s);
             const primaries: DIOMxCell[] = [];
             const secondaries: DIOMxCell[] = [];
             const sysid = s.attributes.id;
             const localusecases = useCases.filter(
-                (u) => u.attributes.parent === s.attributes.id
+                (u) => u.attributes.parent === s.attributes.id || isBound(s, u)
             );
 
             const localrels = rels.filter((r) => {
-                const source = cellByID(useCases, r.attributes.source);
-                const target = cellByID(useCases, r.attributes.target);
+                const { source, target } = r.attributes;
                 return (
-                    source?.attributes.parent === sysid ||
-                    target?.attributes.parent === sysid
+                    source &&
+                    target &&
+                    actors_usecases.some(
+                        ({ attributes: { id } }) =>
+                            id === source || id === target
+                    )
                 );
             });
 
@@ -249,7 +268,9 @@ export class UseCaseDiagramData extends DrawIOXML {
 
                     const isConnected =
                         targets.some((t) => t.attributes.parent === sysid) ||
-                        sources.some((s) => s.attributes.parent === sysid);
+                        sources.some((s) => s.attributes.parent === sysid) ||
+                        targets.some((t) => isBound(s, t)) ||
+                        sources.some((st) => isBound(s, st));
 
                     return ax < x && isConnected;
                 })
@@ -267,7 +288,9 @@ export class UseCaseDiagramData extends DrawIOXML {
 
                     const isConnected =
                         targets.some((t) => t.attributes.parent === sysid) ||
-                        sources.some((s) => s.attributes.parent === sysid);
+                        sources.some((s) => s.attributes.parent === sysid) ||
+                        targets.some((t) => isBound(s, t)) ||
+                        sources.some((st) => isBound(s, st));
 
                     return ax > x && isConnected;
                 })
@@ -356,6 +379,15 @@ export class UseCaseDiagramData extends DrawIOXML {
                 // TODO: Add multi system support
                 if (i !== 0) return;
 
+                console.log(
+                    `%c##### Processing [${sys.attributes.value}] #####`,
+                    "color:lightgreen"
+                );
+
+                console.log({ p, s, u, sys, r });
+
+                const visited_paths: DIOMxCell[] = [];
+
                 // Generate UseCase data starting from primary actors
                 const usecases = p.flatMap((a) => {
                     // Loop through all the usecases of this actor
@@ -363,18 +395,32 @@ export class UseCaseDiagramData extends DrawIOXML {
 
                     const ucs = targets
                         .concat(sources)
-                        .filter((uc) =>
-                            u.some(
-                                (uscs) =>
-                                    uscs.attributes.id === uc.attributes.id
-                            )
+                        .filter(
+                            (uc) =>
+                                u.some(
+                                    (uscs) =>
+                                        uscs.attributes.id === uc.attributes.id
+                                ) &&
+                                !visited_paths.some(
+                                    (v) => v.attributes.id === uc.attributes.id
+                                )
                         );
+
+                    console.log(
+                        `%c---- Starting with Actor: ${a.attributes.value} ----`,
+                        "color:purple"
+                    );
 
                     const paths = ucs
                         .map((uc) => createpath(uc, r, u, [...p, ...s]))
                         .filter<UseCaseData>(
                             (v): v is UseCaseData => v !== undefined
                         );
+
+                    console.log({ ucs, paths, targets, sources });
+
+                    // Add all the ucs as the visited paths
+                    visited_paths.push(...ucs);
 
                     return paths;
                 });

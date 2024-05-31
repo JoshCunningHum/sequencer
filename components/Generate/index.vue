@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { useDevStore } from "../../stores/dev";
-import { set } from "@vueuse/core";
+import { set, promiseTimeout } from "@vueuse/core";
+import { useAsyncStateTimeout } from "../../composables/AsyncStateTimeout";
 
 // Dev Mode Toggling
 const devStore = useDevStore();
 const { enabled: devmode } = storeToRefs(devStore);
 
-// Show of progress
-const showProgress = ref(false);
+// Generate Store
+const generatestore = useGenerationStore();
 
 // Cancel
 const cancel = ref(false);
@@ -16,11 +17,21 @@ const onCancel = () => {
     set(cancel, true);
 };
 
-// Generate
+const {
+    error,
+    execute: onGenerate,
+    isLoading: showProgress,
+    isReady,
+    then,
+} = useAsyncStateTimeout(generatestore.generate, null, {
+    timeout: 30000,
+    immediate: false,
+});
 
-const onGenerate = () => {
-    set(showProgress, true);
-};
+then(
+    () => promiseTimeout(500),
+    () => promiseTimeout(500)
+);
 </script>
 
 <template>
@@ -33,17 +44,18 @@ const onGenerate = () => {
 
         <div class="flex gap-2">
             <GenerateProgress :expand="showProgress" />
-            <GenerateResultContainer> </GenerateResultContainer>
+            <GenerateResultContainer />
         </div>
 
-        <UFormGroup
+        <!-- Additional Context -->
+        <!-- <UFormGroup
             label="Additional Context"
             hint="Optional"
         >
             <UInput
                 placeholder="Enter additional details you want to include..."
             />
-        </UFormGroup>
+        </UFormGroup> -->
 
         <div class="relevant mx-auto">
             <TransitionExpand

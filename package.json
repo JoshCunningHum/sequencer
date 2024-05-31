@@ -8,8 +8,9 @@
         "generate": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
-        "test": "vitest",
-        "testparser": "vitest parse"
+        "test": "vitest --ui",
+        "testparser": "vitest parse --ui",
+        "testconv": "vitest convert --ui"
     },
     "dependencies": {
         "@google/generative-ai": "^0.11.2",
@@ -27,6 +28,7 @@
         "nuxt-typed-router": "^3.6.3",
         "pinia": "^2.1.7",
         "sass": "^1.76.0",
+        "string-pixel-width": "^1.11.0",
         "vue": "^3.4.21",
         "vue-router": "^4.3.0",
         "vue3-xml-viewer": "^0.0.14",
@@ -35,6 +37,9 @@
     },
     "devDependencies": {
         "@nuxt/test-utils": "^3.13.0",
+        "@types/etag": "^1.8.3",
+        "@types/string-pixel-width": "^1.10.3",
+        "@vitest/ui": "^1.6.0",
         "@vue/test-utils": "^2.4.6",
         "happy-dom": "^14.11.0",
         "playwright-core": "^1.44.0",

@@ -1,5 +1,9 @@
 import * as convert from "xml-js";
 
+// DRAWIO CONSTANTS
+export const PAGE_WIDTH = 850;
+export const PAGE_HEIGHT = 1100;
+
 export abstract class DrawIOXML {
     xml: string;
     json: DrawIOJson = { elements: [] };
@@ -40,7 +44,7 @@ export abstract class DrawIOXML {
 type XMLNode = {
     type: "element" | "comment";
     name: string;
-    attributes?: Record<string, string | number | boolean>;
+    attributes?: Record<string, string | number | boolean | undefined>;
     elements: XMLNode[];
 };
 
@@ -68,7 +72,7 @@ export type DIODiagram = XMLNode & {
     // * Essentially a DRAW IO Page
     name: "diagram";
     type: "element";
-    attribute: {
+    attributes: {
         name: string;
         id: string;
     };
@@ -119,7 +123,7 @@ export type DIOMxCell = XMLNode & {
         vertext?: number;
         source?: number;
         target?: number;
-    } & Record<string, string | number | boolean>;
+    };
     elements: DIOMxGeometry[];
 };
 
@@ -163,4 +167,14 @@ export const extractStyleValues = (style?: string): Record<string, any> => {
         }
     }
     return values;
+};
+
+export const createStyleValues = (style?: Record<string, any>): string => {
+    if (!style) return "";
+    return Object.entries(style)
+        .map(
+            ([key, value]) =>
+                `${key}=${typeof value === "object" ? JSON.stringify(value) : value}`
+        )
+        .join(";");
 };

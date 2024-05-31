@@ -21,19 +21,30 @@
         "material-icon-theme.activeIconPack": "vue_vuex",
     },
     "launch": {
-        // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+        // Use IntelliSense to learn about possible attributes.
+        // Hover to view descriptions of existing attributes.
         "version": "0.2.0",
         "configurations": [
             {
+                "type": "chrome",
+                "request": "launch",
+                "name": "client: chrome",
+                "url": "http://localhost:3000",
+                "webRoot": "${workspaceFolder}",
+            },
+            {
                 "type": "node",
                 "request": "launch",
-                "name": "Debug Current Test File",
-                "autoAttachChildProcesses": true,
-                "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
-                "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
-                "args": ["run", "${relativeFile}"],
-                "smartStep": true,
-                "console": "integratedTerminal",
+                "name": "server: nuxt",
+                "outputCapture": "std",
+                "program": "${workspaceFolder}/node_modules/nuxi/bin/nuxi.mjs",
+                "args": ["dev"],
+            },
+        ],
+        "compounds": [
+            {
+                "name": "fullstack: nuxt",
+                "configurations": ["server: nuxt", "client: chrome"],
             },
         ],
     },

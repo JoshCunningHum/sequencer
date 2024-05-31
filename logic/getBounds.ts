@@ -1,6 +1,6 @@
 import type { DIOMxCell } from "~/models/DrawIOXML";
 
-interface Bounds {
+export interface Bounds {
     x?: number;
     y?: number;
     width?: number;

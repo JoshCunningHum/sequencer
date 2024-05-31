@@ -10,11 +10,15 @@ const input_ui = /* ui */ {
             pointer: "",
         },
     },
+    base: "bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white",
     rounded: "rounded-none",
     color: {
         white: {
-            outline: "shadow-none! ring-0!",
+            outline: "shadow-none! ring-0! ",
         },
+    },
+    variant: {
+        none: "bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white border-b border-gray-700 focus:outline-none",
     },
 };
 </script>
@@ -23,6 +27,7 @@ const input_ui = /* ui */ {
     <UInput
         :ui="input_ui"
         v-model="modelValue"
+        variant="none"
         trailing-icon="i-mdi-search"
     >
         <template #trailing>

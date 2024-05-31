@@ -46,7 +46,12 @@ export const useProjectsStore = defineStore("Projects", () => {
     };
 
     const update = async (proj: Project) => {
-        await ProjectController.update(proj);
+        try {
+            await ProjectController.update(proj);
+        } catch {
+            // Do not change anything
+            return;
+        }
         // find the id then update
         const index = projects.findIndex((p) => p.id === proj.id);
         if (index === -1) return;
