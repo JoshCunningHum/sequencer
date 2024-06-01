@@ -45,7 +45,7 @@ export default ({
         x: 50 - width / 2,
         y: start,
         width,
-        height: end - start + 10,
+        height: end - start + 15,
     });
 
     return {

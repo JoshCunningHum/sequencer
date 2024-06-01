@@ -49,7 +49,7 @@ export class ConvertUtil {
                 this.y += 20;
                 break;
             case "message":
-                this.y += 30;
+                this.y += 40;
                 break;
             case "self-message":
                 this.y += SELF_MESSAGE_HEIGHT + 10;

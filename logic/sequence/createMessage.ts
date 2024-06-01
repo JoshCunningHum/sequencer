@@ -76,7 +76,7 @@ export default ({
     const geom = makeMXGeometry({ relative: 1, width: messagewidth });
 
     const y =
-        ConvertUtil.new_y(is_self_message ? "self-message" : "message") + 6;
+        ConvertUtil.new_y(is_self_message ? "self-message" : "message") + 12;
 
     const source_point = makeMXPoint({
         x: ltr ? sac + slh : sac - slh,
