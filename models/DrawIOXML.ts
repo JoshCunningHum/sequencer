@@ -141,7 +141,7 @@ export type DIOMxGeometry = XMLNode & {
         as: "geometry";
         relative?: number;
     };
-    elements: DIOMxPoint[];
+    elements: (DIOMxPoint | DIOMxArray)[];
 };
 
 export type DIOMxPoint = XMLNode & {
@@ -150,8 +150,17 @@ export type DIOMxPoint = XMLNode & {
     attributes: {
         x: number;
         y: number;
-        as: "targetPoint" | "sourcePoint" | "offset";
+        as?: "targetPoint" | "sourcePoint" | "offset";
     };
+};
+
+export type DIOMxArray = XMLNode & {
+    type: "element";
+    name: "Array";
+    attributes: {
+        as: "points";
+    };
+    elements: DIOMxPoint[];
 };
 
 export const isMxGeometry = (node: XMLNode): node is DIOMxGeometry =>

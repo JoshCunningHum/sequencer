@@ -3,7 +3,7 @@ import type { DIOMxCell, DIOMxPoint } from "~/models/DrawIOXML";
 interface MakePointArgs {
     x: number;
     y: number;
-    as: DIOMxPoint["attributes"]["as"];
+    as?: DIOMxPoint["attributes"]["as"];
 }
 
 export default ({ as, x, y }: MakePointArgs): DIOMxPoint => {

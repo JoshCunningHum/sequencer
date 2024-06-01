@@ -23,9 +23,12 @@ import createActivation from "./createActivation";
 import createMessage from "./createMessage";
 import getBounds from "../getBounds";
 import createBlock from "./createBlock";
+import createSelfMessage from "./createSelfMessage";
 
 export const ACTOR_BOX_HEIGHT = 40;
 export const NESTED_BLOCK_PADD = 20;
+export const SELF_MESSAGE_HEIGHT = 70;
+export const SELF_MESSAGE_GAP = 20;
 
 //#region Convert Utility
 export class ConvertUtil {
@@ -49,7 +52,7 @@ export class ConvertUtil {
                 this.y += 30;
                 break;
             case "self-message":
-                this.y += 50;
+                this.y += SELF_MESSAGE_HEIGHT + 10;
                 break;
         }
 
@@ -175,9 +178,9 @@ export const convert = (
     const _lifeline_records: Record<string, [number, number]> = {};
 
     traversedf(data.elements, (item, i) => {
-        while (pad_top_indexes[0] === i) {
-            pad_top_indexes.shift();
-            ConvertUtil.new_y("block");
+        while (pad_top_indexes.includes(i)) {
+            const index = pad_top_indexes.indexOf(i);
+            pad_top_indexes.splice(index, 1);
         }
         if (isSequenceMessage(item)) {
             messages.push(item);
@@ -277,9 +280,9 @@ export const convert = (
     pad_top_indexes.splice(0);
     const sequence_elements: DIOMxCell[] = [];
     traversedf(data.elements, (item, i, depth) => {
-        while (pad_top_indexes[0] === i) {
-            pad_top_indexes.shift();
-            ConvertUtil.new_y("block");
+        while (pad_top_indexes.includes(i)) {
+            const index = pad_top_indexes.indexOf(i);
+            pad_top_indexes.splice(index, 1);
         }
 
         if (isSequenceMessage(item)) {
@@ -299,17 +302,28 @@ export const convert = (
             const { lifeline: target_lifeline, actor: target_actor } =
                 receiver_record;
 
-            const msg = createMessage({
-                message: item,
-                source_lifeline,
-                target_lifeline,
-                source_actor,
-                target_actor,
-            });
+            if (item.sender === item.receiver) {
+                const [lifeline, msg] = createSelfMessage({
+                    message: item,
+                    lifeline: source_lifeline,
+                    actor: source_actor,
+                });
 
-            item.cellid = msg.attributes.id;
+                item.cellid = msg.attributes.id;
+                sequence_elements.push(lifeline, msg);
+            } else {
+                const msg = createMessage({
+                    message: item,
+                    source_lifeline,
+                    target_lifeline,
+                    source_actor,
+                    target_actor,
+                });
 
-            sequence_elements.push(msg);
+                item.cellid = msg.attributes.id;
+
+                sequence_elements.push(msg);
+            }
         } else if (isSequenceBlock(item)) {
             //#region - Blocks -
 

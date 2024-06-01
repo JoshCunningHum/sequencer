@@ -8,7 +8,7 @@ interface ActivationParams {
     end: number;
     width?: number;
 }
-`html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={"curved":0,"rounded":0};`;
+
 export default ({
     actor_id,
     end,
