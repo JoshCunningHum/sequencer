@@ -7,7 +7,7 @@ interface MakeCellArgs {
     parent?: number;
     value?: string;
     style?: string;
-    vertext?: number;
+    vertex?: number;
     source?: number;
     target?: number;
     bound?: Bounds;
@@ -20,7 +20,7 @@ export default ({
     source,
     style,
     value,
-    vertext,
+    vertex,
     bound,
 }: MakeCellArgs): DIOMxCell => {
     const data: DIOMxCell = {
@@ -31,7 +31,7 @@ export default ({
             source,
             style,
             value,
-            vertext,
+            vertex,
         },
         elements: [],
         name: "mxCell",

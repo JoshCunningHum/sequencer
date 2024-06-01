@@ -5,12 +5,13 @@ import makeMXGeometry from "./makeMXGeometry";
 interface ActorParams {
     value: string;
     index: number;
+    box_height?: number;
 }
 
-export default ({ value, index }: ActorParams): DIOMxCell => {
+export default ({ value, index, box_height = 20 }: ActorParams): DIOMxCell => {
     const { width: txtwidth, height: txtheight } = getTextDimensions(value);
     const width = Math.max(txtwidth, 60) + 40;
-    const bx_height = Math.max(txtheight, 20) + 20;
+    const bx_height = Math.max(txtheight + 20, box_height);
     const style = createStyleValues({
         shape: "umlLifeline",
         perimeter: "lifelinePerimeter",

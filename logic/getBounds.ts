@@ -5,6 +5,7 @@ export interface Bounds {
     y?: number;
     width?: number;
     height?: number;
+    relative?: 1;
 }
 
 export default (cell: DIOMxCell) => {

@@ -1,6 +1,8 @@
 import { convert } from "~/logic/sequence/converter";
 import { parse } from "~/logic/sequence/parser";
 import * as c from "xml-js";
+import type { DIOMxCell } from "./DrawIOXML";
+import cellByID from "~/logic/cellByID";
 
 export enum SequenceProcessErrror {
     InvalidJSON = "Invalid JSON",
@@ -53,14 +55,23 @@ export interface Message {
     sender: string;
     receiver: string;
     content: string;
+    cellid?: number;
 }
 
-export interface Block {
-    type: "alt" | "opt" | "par" | "loop" | "block";
+export type Block = {
+    cellid?: number;
     elements: SequenceElement[];
     conditions: string[]; // for 'alt' blocks
-    parent?: Block; // for nested blocks
-}
+} & (
+    | {
+          type: "alt" | "opt" | "par" | "loop";
+          parent?: Block; // for nested blocks
+      }
+    | {
+          type: "block";
+          parent: Block;
+      }
+);
 
 export interface Note {
     text: string;
@@ -72,3 +83,23 @@ export interface Activation {
     start: SequenceElement; // element where the activation starts
     end?: SequenceElement; // element where the activation ends (optional)
 }
+
+export const isSequenceMessage = (
+    element: SequenceElement
+): element is Message => {
+    return "content" in element;
+};
+
+export const isSequenceBlock = (element: SequenceElement): element is Block => {
+    return "elements" in element;
+};
+
+export const isSequenceNote = (element: SequenceElement): element is Note => {
+    return "text" in element;
+};
+
+export const isSequenceActivation = (
+    element: SequenceElement
+): element is Activation => {
+    return "actor" in element;
+};

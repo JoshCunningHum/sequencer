@@ -7,7 +7,7 @@ export const useSystemInstructions = (
       - Participants format:
       Participants: 
           Participant1 Participant2
-          * A list of participants/actors in the diagram, separated by space
+          * A list of participants/actors in the diagram, separated by space. If an actor consist of multiple words, use underscores instead of spaces.
       
       - Message Format:
       Participant1 -> Participant2: Message1

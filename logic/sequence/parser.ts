@@ -17,10 +17,16 @@ const isparticipantline = (line: string) => {
     );
 };
 
+const DEV = false;
+
 export const parse = (
     str: string
 ): { actors: string[]; title: string; elements: SequenceElement[] } => {
     const lines = str.split("\n");
+    const longestline = lines.reduce(
+        (longest, line) => Math.max(longest, line.length),
+        0
+    );
 
     let title = "";
     const actors: string[] = [];
@@ -33,6 +39,7 @@ export const parse = (
     const activations: Activation[] = [];
 
     let PREVENTLOOP = str.length * 2;
+    let lastline = "";
 
     for (let i = 0; i < str.length; i++) {
         const slice = str.slice(i);
@@ -45,32 +52,58 @@ export const parse = (
             );
         }
 
+        const line = getline(str, i);
+        const linestr = lines[line - 1];
+        const displayline = () => `${line}| ${linestr}`;
+
         const whitespacematch = slice.match(/^\s+/);
-        const titlematch = slice.match(/^Sequence:\s*[a-z]+\n/i);
+        const titlematch = slice.match(/^Sequence:\s*[a-z_]+\n/i);
         const participantsmatch = slice.match(/^Participants:/i);
         const messagematch = slice.match(
-            /^[ \t]*[a-z0-9]+[ ]*\-?\->[ ]*[a-z0-9]+:[ ]*[a-z0-9]+\n?/i
+            /^[ \t]*[a-z0-9_]+[ ]*\-?\->[ ]*[a-z0-9_]+:[ ]*[a-z0-9_ ]+\n?/i
         );
         const blockmatch = slice.match(
-            /^[ \t]*(alt|opt|par|loop)([ ]+[a-z0-9]*)?\n/i
+            /^[ \t]*(alt|opt|par|loop)([ ]+[a-z0-9_ ]*)?\n/i
         );
         const endblock = slice.match(/^[ \t]*end/i);
-        const elseblock = slice.match(/^[ \t]*else([ ]+[a-z0-9]*)?\n/i);
+        const elseblock = slice.match(/^[ \t]*else([ ]+[a-z0-9_ ]*)?\n/i);
         const paritem = slice.match(/^\|\|/i);
-        const acts = slice.match(/^[ \t]*(de)?activate[ ]*[a-z0-9]+/i);
+        const acts = slice.match(/^[ \t]*(de)?activate[ ]*[a-z0-9_]+/i);
+
+        if (
+            DEV &&
+            (titlematch ||
+                participantsmatch ||
+                messagematch ||
+                blockmatch ||
+                endblock ||
+                elseblock ||
+                paritem ||
+                acts)
+        ) {
+            const txt = displayline();
+            lastline = txt;
+            console.log(
+                txt +
+                    `${" ".repeat(longestline + 10 - txt.length)}${!!whitespacematch ? "w" : ""}${!!titlematch ? "t" : ""}${!!participantsmatch ? "p" : ""}${!!messagematch ? "m" : ""}${!!blockmatch ? "b" : ""}${!!endblock ? "n" : ""}${!!elseblock ? "e" : ""}${!!paritem ? "r" : ""}${!!acts ? "a" : ""}`
+            );
+        }
 
         if (whitespacematch) {
+            //#region Whitespaces
             // Whitespaces
             i += whitespacematch.length - 1;
             continue;
         } else if (titlematch) {
-            // Title
+            //#region Title
             const [match] = titlematch;
             i += match.length - 1;
             title = match.split(":")[1].trim();
             continue;
         } else if (participantsmatch && !acts) {
-            // Participants
+            if (DEV) console.log(`-------- Encountered Participants --------`);
+
+            //#region Participants
             i += participantsmatch[0].length;
             do {
                 const line = lines[getline(str, i)];
@@ -89,12 +122,14 @@ export const parse = (
                     .map((act) => act.trim())
                     .filter((act) => !!act && act.length > 0);
 
+                if (DEV) console.log(`Got: `, extracted_actors);
+
                 actors.push(...extracted_actors);
 
                 i += line.length;
             } while (true);
         } else if (messagematch) {
-            // Messages
+            //#region Messages
             const [match] = messagematch;
             const isasync = match.includes("-->");
             const [ps, msg] = match.split(":");
@@ -108,7 +143,7 @@ export const parse = (
             };
 
             if (currentblock) {
-                const curr = currentblock as Block;
+                const curr = currentblock;
                 curr.elements.push(message);
             } else {
                 elements.push(message);
@@ -118,16 +153,18 @@ export const parse = (
 
             i += match.length - 1;
         } else if (blockmatch) {
-            const [type, condition] = blockmatch[0].trim().split(/\s+/);
+            //#region Blocks
+            const [type, ...conditiontxt] = blockmatch[0].trim().split(/\s+/);
+            const condition = conditiontxt.join(" ");
 
             const block: Block = {
-                type: type as Block["type"],
+                type: type as "alt" | "opt" | "par" | "loop",
                 elements: [],
                 conditions: condition ? [condition.trim()] : [],
             };
 
             if (currentblock) {
-                const curr = currentblock as Block;
+                const curr = currentblock;
                 curr.elements.push(block);
                 block.parent = currentblock;
             }
@@ -146,10 +183,16 @@ export const parse = (
                 currentblock = containerblock;
             }
 
+            if (DEV)
+                console.log(`-------- Encountered [${type}] block --------`);
+
             i += blockmatch[0].length - 1;
         } else if (elseblock) {
+            //#region Else Blocks
             const [match] = elseblock;
             const condition = match.replace(/(else\s|if\s)/gim, "").trim();
+
+            if (DEV) console.log(`-------- Encountered [else] block --------`);
 
             // the current block here is the block that contains all things in the previous condition
             if (currentblock) {
@@ -166,7 +209,7 @@ export const parse = (
                 if (curr.type === "block") {
                     const elseblock: Block = {
                         type: "block",
-                        conditions: [],
+                        conditions: [condition],
                         elements: [],
                         parent: curr.parent,
                     };
@@ -180,6 +223,7 @@ export const parse = (
 
             i += match.length - 1;
         } else if (paritem) {
+            //#region Parallel Blocks
             const [match] = paritem;
 
             if (currentblock) {
@@ -202,7 +246,9 @@ export const parse = (
 
             i += match.length - 1;
         } else if (endblock) {
-            if (currentblock) {
+            //#region End Statements
+            const dpline = displayline();
+            if (currentblock !== null) {
                 const [match] = endblock;
                 i += match.length - 1;
                 const block = currentblock as Block;
@@ -234,8 +280,11 @@ export const parse = (
                     elements.push(block);
                     currentblock = null;
                 }
-            } else throw new Error(`End block with no starting block`);
+            } else {
+                throw new Error(`End block with no starting block: ${dpline}`);
+            }
         } else if (acts) {
+            //#region Activations
             const [match] = acts;
             const [command, actor] = match.trim().split(/\s+/);
             const isactivate = command === "activate";

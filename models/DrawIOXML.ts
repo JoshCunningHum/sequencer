@@ -120,7 +120,7 @@ export type DIOMxCell = XMLNode & {
         parent?: number;
         value?: string;
         style?: string;
-        vertext?: number;
+        vertex?: number;
         source?: number;
         target?: number;
     };
@@ -139,6 +139,18 @@ export type DIOMxGeometry = XMLNode & {
         width: number;
         height: number;
         as: "geometry";
+        relative?: number;
+    };
+    elements: DIOMxPoint[];
+};
+
+export type DIOMxPoint = XMLNode & {
+    type: "element";
+    name: "mxPoint";
+    attributes: {
+        x: number;
+        y: number;
+        as: "targetPoint" | "sourcePoint" | "offset";
     };
 };
 
@@ -172,9 +184,10 @@ export const extractStyleValues = (style?: string): Record<string, any> => {
 export const createStyleValues = (style?: Record<string, any>): string => {
     if (!style) return "";
     return Object.entries(style)
-        .map(
-            ([key, value]) =>
-                `${key}=${typeof value === "object" ? JSON.stringify(value) : value}`
+        .map(([key, value]) =>
+            value === true
+                ? key
+                : `${key}=${typeof value === "object" ? JSON.stringify(value) : value}`
         )
         .join(";");
 };

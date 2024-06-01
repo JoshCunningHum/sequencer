@@ -4,9 +4,14 @@ import { usecase_default } from "../models/UseCaseDiagramData";
 import { class_default } from "../models/ClassDiagramData";
 
 // Props and Emits
-const { noAutosave = false, saving = false } = defineProps<{
+const {
+    noAutosave = false,
+    saving = false,
+    viewOnly = false,
+} = defineProps<{
     noAutosave?: boolean;
     saving?: boolean;
+    viewOnly?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -20,7 +25,7 @@ const model = defineModel<string>({
 
 // DrawIO Source Config
 
-const params = {
+const params: Record<string, number | string> = {
     embed: 1,
     spin: 1,
     ui: "min",
@@ -29,6 +34,11 @@ const params = {
     format: "xml",
     noExitBtn: 1,
 };
+
+if (viewOnly) {
+    params.noSaveBtn = 1;
+    params.saveAndExit = 0;
+}
 
 const embedlink = "https://embed.diagrams.net";
 
@@ -60,8 +70,10 @@ interface DrawIOMsg {
     xml?: string;
 }
 
-const receive = (evt: MessageEvent) => {
-    if (evt.origin !== embedlink) return;
+const componentid = ref(genid(16));
+
+const receive = (evt: MessageEvent, fromid: string) => {
+    if (evt.origin !== embedlink || fromid !== componentid.value) return;
 
     const msg = JSON.parse(evt.data) as DrawIOMsg;
 
@@ -71,6 +83,7 @@ const receive = (evt: MessageEvent) => {
             set(loaded, false);
             break;
         case "save":
+            if (viewOnly) return;
             console.log(`%cSaving...`, "color: orange");
             model.value = msg.xml || "";
             emit("save", msg.xml || "");
@@ -82,14 +95,19 @@ const receive = (evt: MessageEvent) => {
     }
 };
 
+const messagehandler = (e: MessageEvent) => {
+    receive(e, componentid.value);
+};
+
 // Iframe event binding
 
 onMounted(() => {
-    window.addEventListener("message", receive);
+    componentid.value = genid(16);
+    window.addEventListener("message", messagehandler);
 });
 
 onUnmounted(() => {
-    window.removeEventListener("message", receive);
+    window.removeEventListener("message", messagehandler);
 });
 
 watch(model, (xml) => setXML(xml));

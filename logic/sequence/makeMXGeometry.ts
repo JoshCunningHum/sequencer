@@ -6,6 +6,7 @@ export default ({
     width = 1,
     x,
     y,
+    relative,
 }: Partial<DIOMxGeometry["attributes"]>): DIOMxGeometry => ({
     attributes: {
         x,
@@ -13,6 +14,7 @@ export default ({
         width,
         height,
         as,
+        relative,
     },
     elements: [],
     name: "mxGeometry",

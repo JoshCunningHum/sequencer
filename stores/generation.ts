@@ -41,49 +41,58 @@ export const useGenerationStore = defineStore("Generation", () => {
     const classprompt = ref<string>("");
     const usecaseprompt = ref<string>("");
     const sequenceprompt = ref<string>("");
-    const sequencetestprompt = ref<string>(`Sequence: CodeGenApp
-    Participants:
-        User Server Database LLM API
+    const sequencetestprompt = ref<string>(`Participants:    
+    User Server LLM_API Database EmailService    
     
-      User -> Server: Login(email, password)
-      Server -> Database: CheckCredentials(email, password)
-      Database --> Server: CredentialsValid
+    User -> Server: Login(email, password)
+    Server -> Database: CheckCredentials(email, password)
+    Database --> Server: CredentialsValid    
     
-      alt CredentialsValid
-        Server --> User: ShowDashboard
-      else CredentialsInvalid
-        Server --> User: ShowLoginError
+    alt CredentialsValid    
+      Server --> User: ShowDashboard    
+      User -> Server: UploadDocument(document)    
+      Server -> Database: StoreDocument(document)    
+      Database --> Server: DocumentStored    
+      alt DocumentStored        
+        Server -> User: ShowDocumentUploaded        
+        User -> Server: GenerateResult(document)        
+        Server -> LLM_API: ProcessDocument(document)        
+        LLM_API --> Server: ResultGenerated        
+        alt ResultGenerated            
+          Server -> Database: StoreResult(result)            
+          Database --> Server: ResultStored            
+          Server -> User: ShowResult(result)        
+        else ResultNotGenerated            
+          Server -> User: ShowError(error)        
+        end    
+      else DocumentNotStored        
+        Server -> User: ShowError(error)    
       end
+    else CredentialsInvalid    
+      Server --> User: ShowLoginError
+    end
+  
+    User -> Server: Register(email, password, username)
+    Server -> Database: CheckEmailExists(email)
+    Database --> Server: EmailExists    
     
-      User -> Server: Register(email, password, username)
-      Server -> Database: CheckExistingUser(email)
-      Database --> Server: UserExists
-    
-      alt UserExists
-        Server --> User: ShowRegistrationError
-      else !UserExists
-        Server -> Database: CreateUser(email, password, username)
-        Database --> Server: UserCreated
-        Server --> User: ShowLogin
+    alt EmailExists    
+      Server -> User: ShowEmailExistsError
+    else EmailNotExists    
+      Server -> Database: StoreUser(email, password, username)    
+      Database --> Server: UserStored    
+      alt UserStored        
+        Server -> EmailService: SendWelcomeEmail(email)        
+        EmailService --> Server: EmailSent        
+        Server -> User: ShowRegistrationSuccess    
+      else UserNotStored        
+        Server -> User: ShowRegistrationError    
       end
+    end
     
-      User -> Server: UploadDocument(document)
-      Server -> Database: StoreDocument(document)
-      Database --> Server: DocumentStored
-      Server -> LLM API: ProcessDocument(document)
-      LLM API --> Server: Result
-      Server -> Database: StoreResult(result)
-      Database --> Server: ResultStored
-      Server -> User: ShowResult(result)
-    
-      alt ResultError
-        Server -> User: ShowParsingError
-        alt Back
-          User -> Server: GoBack
-        else Again
-          User -> Server: ReUploadDocument
-        end
-      end`);
+    User -> Server: Logout
+    Server -> User: ClearSession
+    Server --> User: ShowLogin`);
 
     //#region Preperations
 
