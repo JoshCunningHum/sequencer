@@ -136,9 +136,10 @@ export const useGenerationStore = defineStore("Generation", () => {
 
         console.log(`%c### Generating Sequence ###`, "color:magenta");
 
+        let MAX_RETRY = 7;
         let success = false,
             xml = "";
-        while (!success) {
+        while (!success && MAX_RETRY > 0) {
             // Continously request for the result until it is a good result
             try {
                 if (devStore.enabled && sequencetestprompt.value) {
@@ -154,7 +155,13 @@ export const useGenerationStore = defineStore("Generation", () => {
                 get(progress).push(GenerationProgress["Received Result"]);
                 get(progress).push(GenerationProgress["Parsing Fail"]);
                 console.log(`%cParsing Failed. Retrying...`, "color:crimson");
+            } finally {
+                MAX_RETRY--;
             }
+        }
+
+        if (MAX_RETRY === 0) {
+            throw new Error(`Something wrong width generation`);
         }
 
         get(progress).push(GenerationProgress["Parsed Result"]);
