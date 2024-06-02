@@ -71,6 +71,7 @@ export class ProjectController {
                 name: p.name,
                 class: p.class,
                 usecase: p.usecase,
+                sequence: p.sequence,
             })
             .eq("id", p.id)
             .eq("by", user.value.id);

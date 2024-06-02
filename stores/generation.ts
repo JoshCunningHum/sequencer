@@ -8,8 +8,17 @@ import { set, get } from "@vueuse/core";
 import { SequenceDiagramData } from "~/models/SequenceDiagramData";
 import { GenerationController } from "~/controllers/GenerationControl";
 
+export enum GenerationProgress {
+    "Generate Prompt" = 10,
+    "Received Result" = 30,
+    "Parsed Result" = 35,
+    "Parsing Fail" = -30, // Go back to the received result
+    "Update Database" = 25,
+}
+
 export const useGenerationStore = defineStore("Generation", () => {
     const devStore = useDevStore();
+    const projectStore = useProjectsStore();
 
     //#region State
 
@@ -21,6 +30,8 @@ export const useGenerationStore = defineStore("Generation", () => {
     });
 
     //#region Data
+    const progress = ref<GenerationProgress[]>([]);
+    const project = ref<Project>();
 
     const classxml = ref<string>("");
     const usecasexml = ref<string>("");
@@ -41,58 +52,7 @@ export const useGenerationStore = defineStore("Generation", () => {
     const classprompt = ref<string>("");
     const usecaseprompt = ref<string>("");
     const sequenceprompt = ref<string>("");
-    const sequencetestprompt = ref<string>(`Participants:    
-    User Server LLM_API Database EmailService    
-    
-    User -> Server: Login(email, password)
-    Server -> Database: CheckCredentials(email, password)
-    Database --> Server: CredentialsValid    
-    
-    alt CredentialsValid    
-      Server --> User: ShowDashboard    
-      User -> Server: UploadDocument(document)    
-      Server -> Database: StoreDocument(document)    
-      Database --> Server: DocumentStored    
-      alt DocumentStored        
-        Server -> User: ShowDocumentUploaded        
-        User -> Server: GenerateResult(document)        
-        Server -> LLM_API: ProcessDocument(document)        
-        LLM_API --> Server: ResultGenerated        
-        alt ResultGenerated            
-          Server -> Database: StoreResult(result)            
-          Database --> Server: ResultStored            
-          Server -> User: ShowResult(result)        
-        else ResultNotGenerated            
-          Server -> User: ShowError(error)        
-        end    
-      else DocumentNotStored        
-        Server -> User: ShowError(error)    
-      end
-    else CredentialsInvalid    
-      Server --> User: ShowLoginError
-    end
-  
-    User -> Server: Register(email, password, username)
-    Server -> Database: CheckEmailExists(email)
-    Database --> Server: EmailExists    
-    
-    alt EmailExists    
-      Server -> User: ShowEmailExistsError
-    else EmailNotExists    
-      Server -> Database: StoreUser(email, password, username)    
-      Database --> Server: UserStored    
-      alt UserStored        
-        Server -> EmailService: SendWelcomeEmail(email)        
-        EmailService --> Server: EmailSent        
-        Server -> User: ShowRegistrationSuccess    
-      else UserNotStored        
-        Server -> User: ShowRegistrationError    
-      end
-    end
-    
-    User -> Server: Logout
-    Server -> User: ClearSession
-    Server --> User: ShowLogin`);
+    const sequencetestprompt = ref<string>(``);
 
     //#region Preperations
 
@@ -124,21 +84,16 @@ export const useGenerationStore = defineStore("Generation", () => {
     };
 
     const preparesequence = async (p: Project) => {
-        const { sequence: datatxt } = p;
-        if (!datatxt) return;
-
-        const data = new SequenceDiagramData();
-
+        const { sequence: xml } = p;
+        if (!xml) return;
         // process json and create sequence data for dev-view
-        const xml = data.process(datatxt);
-
         set(sequencexml, xml);
-        set(sequencedata, data);
-
         states.sequence = false;
     };
 
     const prepare = async (p: Project) => {
+        set(project, p);
+
         states.preparing = true;
         states.class = true;
         states.usecase = true;
@@ -164,6 +119,8 @@ export const useGenerationStore = defineStore("Generation", () => {
     //#region Generation
 
     const generate = async () => {
+        get(progress).splice(0);
+
         // Generate prompt
         const classdiag = classdata.value;
         const usecasediag = usecasedata.value;
@@ -175,11 +132,32 @@ export const useGenerationStore = defineStore("Generation", () => {
             seqdiag
         );
 
+        get(progress).push(GenerationProgress["Generate Prompt"]);
+
         console.log(`%c### Generating Sequence ###`, "color:magenta");
 
-        const xml = await (devStore.enabled && sequencetestprompt.value
-            ? seqdiag.process(sequencetestprompt.value)
-            : generation.generateSequenceDiagram());
+        let success = false,
+            xml = "";
+        while (!success) {
+            // Continously request for the result until it is a good result
+            try {
+                if (devStore.enabled && sequencetestprompt.value) {
+                    xml = seqdiag.process(sequencetestprompt.value);
+                    success = true;
+                    get(progress).push(GenerationProgress["Received Result"]);
+                } else {
+                    xml = await generation.generateSequenceDiagram();
+                    get(progress).push(GenerationProgress["Received Result"]);
+                    success = true;
+                }
+            } catch (e) {
+                get(progress).push(GenerationProgress["Received Result"]);
+                get(progress).push(GenerationProgress["Parsing Fail"]);
+                console.log(`%cParsing Failed. Retrying...`, "color:crimson");
+            }
+        }
+
+        get(progress).push(GenerationProgress["Parsed Result"]);
 
         console.log(
             `%cArrived Data: %c${seqdiag.txt}`,
@@ -198,12 +176,22 @@ export const useGenerationStore = defineStore("Generation", () => {
 
         // Change xml ref
         set(sequencexml, xml);
+
+        // update the xml in supabase
+        const proj = get(project);
+        if (proj) {
+            proj.sequence = xml;
+            await projectStore.update(proj);
+        }
+
+        get(progress).push(GenerationProgress["Update Database"]);
     };
 
     return {
         prepare,
         generate,
         states,
+        progress,
 
         classxml,
         classdata,
