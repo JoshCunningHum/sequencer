@@ -160,7 +160,7 @@ onMounted(() => project.value && prepare(project.value));
 
             <!-- Confirmation -->
             <ForcedPreloader
-                :show="step === 1"
+                :show="step === (devMode ? 1 : 100)"
                 v-slot="{ done }"
             >
                 <LazyConfirmation
@@ -171,7 +171,7 @@ onMounted(() => project.value && prepare(project.value));
 
             <!-- Generate -->
             <ForcedPreloader
-                :show="step === 2"
+                :show="step === (devMode ? 2 : 1)"
                 v-slot="{ done }"
             >
                 <LazyGenerate
