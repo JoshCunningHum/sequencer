@@ -39,6 +39,8 @@ then(
         class="gap-2 p-4 DMSans"
         flex-col
     >
+        <GenerateErrorModal />
+
         <ModalGenerateCancel v-model="cancel" />
         <ModalGenerateNew />
 

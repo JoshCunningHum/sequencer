@@ -29,8 +29,10 @@ export const useGenerationStore = defineStore("Generation", () => {
         sequence: false,
     });
 
-    //#region Data
     const progress = ref<GenerationProgress[]>([]);
+    const error = ref<string>();
+
+    //#region Data
     const project = ref<Project>();
 
     const classxml = ref<string>("");
@@ -161,7 +163,8 @@ export const useGenerationStore = defineStore("Generation", () => {
         }
 
         if (MAX_RETRY === 0) {
-            throw new Error(`Something wrong width generation`);
+            error.value = `Error connecting to server. Please try again later.`;
+            return;
         }
 
         get(progress).push(GenerationProgress["Parsed Result"]);
@@ -199,6 +202,7 @@ export const useGenerationStore = defineStore("Generation", () => {
         generate,
         states,
         progress,
+        error,
 
         classxml,
         classdata,
