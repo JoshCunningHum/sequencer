@@ -1,108 +1,59 @@
 <script setup lang="ts">
-import { set, get } from "@vueuse/core";
-import type { FormSubmitEvent } from "#ui/types";
-import { AuthController } from "~/controllers/AuthController";
-import {
-    RegisterSchema as schema,
-    type RegisterSchemaType,
-} from "@/composables/FormSchemas";
+import * as yup from "yup";
+import { registerSchema as schema } from "~/schemas/auth";
 
-// Data
-const state = reactive({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    username: "",
-});
+const toast = useToast();
 
-// Fetching
-const loading = ref(false);
-const isSuccess = ref(false);
-const isError = ref(false);
+const {
+    isLoading,
+    state: error,
+    execute,
+} = useAsyncState(
+    async (body: yup.InferType<typeof schema>) =>
+        await $fetch("/api/users/register", { method: "POST", body })
+            .then(() => navigateTo("/login"))
+            .then(() =>
+                toast.add({
+                    severity: "success",
+                    summary: "Registration Success",
+                    detail: "Please login using your credentials",
+                    life: 2000,
+                })
+            )
+            .catch((err) =>
+                toast.add({
+                    severity: "error",
+                    summary: "Registration Failed",
+                    detail: err.statusMessage,
+                    closable: true,
+                    life: 2000,
+                })
+            ),
+    undefined,
+    { immediate: false }
+);
 
-const onSubmit = async (event: FormSubmitEvent<RegisterSchemaType>) => {
-    set(loading, true);
-
-    const { email, password, username } = event.data;
-
-    const result = await AuthController.SignUp(email, password, username);
-
-    if (typeof result === "boolean") set(isSuccess, true);
-    else set(isError, true);
-
-    set(loading, false);
+const onSubmit = (state: yup.InferType<typeof schema>) => {
+    console.trace("test");
+    execute(0, state);
 };
 </script>
 
 <template>
-    <div class="flex items-center">
-        <UModal v-model="isError">
-            <UCard class="text-sm text-center"> Email already taken </UCard>
-        </UModal>
-        <UModal v-model="isSuccess">
-            <UCard class="text-sm text-center">
-                Success! Now please login using your email
-            </UCard>
-        </UModal>
-
-        <UForm
-            class="flex flex-col gap-2"
-            :schema="schema"
-            :state="state"
+    <Fill class="min-w-[400px]" flex-col center>
+        <DynamicForm
+            :schema
             @submit="onSubmit"
-        >
-            <UFormGroup
-                label="Display Name"
-                name="name"
-                size="xs"
-            >
-                <UInput v-model="state.username" />
-            </UFormGroup>
-
-            <UFormGroup
-                label="Email"
-                name="email"
-                size="xs"
-            >
-                <UInput v-model="state.email" />
-            </UFormGroup>
-
-            <UFormGroup
-                label="Password"
-                name="password"
-                size="xs"
-            >
-                <PasswordInput v-model="state.password" />
-            </UFormGroup>
-
-            <UFormGroup
-                label="Confirm Password"
-                name="confirmPassword"
-                size="xs"
-            >
-                <PasswordInput v-model="state.confirmPassword" />
-            </UFormGroup>
-
-            <UButton
-                block
-                class="my-1"
-                :loading="loading"
-                type="submit"
-                >Register</UButton
-            >
-
-            <span class="text-sm"
-                >Already have an account?
-                <ULink
-                    to="/login"
-                    active-class="text-primary"
-                    inactive-class="text-neutral-400 hover:text-neutral-200"
-                >
-                    Login Here</ULink
-                >
-            </span>
-        </UForm>
-    </div>
+            join-labels
+            class="mx-auto w-full max-w-[300px]"
+            confirm-text="Register"
+            :is-submitting="isLoading"
+        />
+        <div class="w-full text-right max-w-[300px]">
+            <Anchor class="text-emerald-400 text-sm" to="/login">or login here</Anchor>
+        </div>
+        {{ error }}
+    </Fill>
 </template>
 
 <style lang="scss" scoped></style>

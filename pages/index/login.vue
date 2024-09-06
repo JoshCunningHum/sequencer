@@ -1,106 +1,52 @@
 <script setup lang="ts">
-import { set, get } from "@vueuse/core";
-import {
-    LoginSchema as schema,
-    type LoginSchemaType,
-} from "@/composables/FormSchemas";
-import type { FormSubmitEvent } from "#ui/types";
-import { AuthController } from "../../controllers/AuthController";
+import * as yup from "yup";
+import type { QuerySchemaMeta } from "~/components/DynamicForm/types";
+import { loginSchema as schema } from "~/schemas/auth";
+import type { User } from "~/server/utils/drizzle";
 
-// Router
-const route = useRoute();
-const router = useRouter();
+const toast = useToast();
 
-// Data
-const state = reactive({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    username: "",
-});
+const { isLoading, execute } = useAsyncState(
+    async (body: yup.InferType<typeof schema>) =>
+        await $fetch("/api/users/login", { method: "POST", body })
+            .then(() =>
+                toast.add({
+                    severity: "success",
+                    summary: "Login Success",
+                    detail: "Please enjoy using the app",
+                    life: 1000,
+                })
+            )
+            .catch((err) =>
+                toast.add({
+                    severity: "error",
+                    summary: "Login Failed",
+                    detail: err.statusMessage,
+                    closable: true,
+                    life: 1500,
+                })
+            ),
+    undefined,
+    { immediate: false }
+);
 
-// Fetching
-const loading = ref(false);
-const isSuccess = ref(false);
-
-const isError = ref(false);
-const errorCause = ref("Login Error");
-const errorMessage = ref("Please recheck your credentials");
-
-const onSubmit = async (event: FormSubmitEvent<LoginSchemaType>) => {
-    set(loading, true);
-
-    const { email, password } = event.data;
-
-    const result = await AuthController.SignIn(email, password);
-
-    if (typeof result === "boolean") {
-        set(isSuccess, true);
-        router.push("/dashboard");
-    } else {
-        set(isError, true);
-        set(errorMessage, result.message);
-        set(errorCause, result.cause || "Login Error");
-    }
-
-    set(loading, false);
-};
+const onSubmit = (state: yup.InferType<typeof schema>) => execute(0, state);
 </script>
 
 <template>
-    <div class="flex items-center">
-        <UModal v-model="isError">
-            <UAlert
-                title="Login Error"
-                :description="errorMessage"
-                color="red"
-                variant="subtle"
-                icon="i-mdi-alert"
-            />
-        </UModal>
-
-        <UForm
-            class="flex flex-col gap-2"
-            :schema="schema"
-            :state="state"
+    <Fill class="min-w-[400px]" flex-col center>
+        <DynamicForm
+            :schema
             @submit="onSubmit"
-        >
-            <UFormGroup
-                label="Email"
-                name="email"
-                size="xs"
-            >
-                <UInput v-model="state.email" />
-            </UFormGroup>
-
-            <UFormGroup
-                label="Password"
-                name="password"
-                size="xs"
-            >
-                <PasswordInput v-model="state.password" />
-            </UFormGroup>
-
-            <UButton
-                block
-                class="my-1"
-                :loading="loading"
-                type="submit"
-                >Login</UButton
-            >
-
-            <span class="text-sm"
-                >Don't have an account?
-                <ULink
-                    to="/register"
-                    active-class="text-primary"
-                    inactive-class="text-neutral-400 hover:text-neutral-200"
-                >
-                    Register Here</ULink
-                >
-            </span>
-        </UForm>
-    </div>
+            join-labels
+            class="mx-auto w-full max-w-[300px]"
+            confirm-text="Login"
+            :is-submitting="isLoading"
+        />
+        <div class="w-full text-right max-w-[300px]">
+            <Anchor class="text-emerald-400 text-sm" to="/register">or register here</Anchor>
+        </div>
+    </Fill>
 </template>
 
 <style lang="scss" scoped></style>

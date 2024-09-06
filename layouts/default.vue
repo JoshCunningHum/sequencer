@@ -1,9 +1,5 @@
-<script lang="ts" setup></script>
-
 <template>
-    <div class="w-screen h-screen flex flex-col">
-        <slot />
-    </div>
+    <Screen>
+        <slot></slot>
+    </Screen>
 </template>
-
-<style lang="scss" scoped></style>

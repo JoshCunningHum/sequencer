@@ -1,0 +1,17 @@
+{
+    "folders": [
+		{
+			"path": "."
+		}
+	],
+    "settings": {
+        "files.associations": {
+            "*.css": "tailwindcss"
+        },
+        "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui"],
+        "nuxtr.intellisense.nuxtrc": true,
+        "nuxtr.intellisense.vueFiles": true,
+        "nuxtr.intellisense.nuxtignore": true,
+        "tailwindCSS.experimental.configFile": "tailwind.config.ts"
+    }
+}

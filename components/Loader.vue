@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import Loading from "@/components/Loading.vue";
+import Fill from "@/components/Fill.vue";
+
 defineOptions({
     inheritAttrs: false,
 });
@@ -8,27 +11,25 @@ const slots = defineSlots<{
     loader(): any;
 }>();
 
-const { finished = false, text = "Loading" } = defineProps<{
+const {
+    finished = false,
+    text = "Loading",
+    noCenter = false,
+} = defineProps<{
     finished?: boolean;
     text?: string;
+    noCenter?: boolean;
+    noFill?: boolean;
 }>();
 </script>
 
 <template>
-    <slot
-        v-if="finished"
-        :="$attrs"
-    ></slot>
-    <slot
-        v-else
-        name="loader"
-    >
-        <Fill
-            :="$attrs"
-            class="justify-center items-center"
-        >
-            <Loading :data="text" />
+    <slot v-if="finished" :="$attrs"></slot>
+    <slot v-else name="loader">
+        <Fill v-if="!noFill" :center="!noCenter" :="$attrs">
+            <Loading :data="text" no-ellipsis />
         </Fill>
+        <Loading v-else :data="text" no-ellipsis />
     </slot>
 </template>
 

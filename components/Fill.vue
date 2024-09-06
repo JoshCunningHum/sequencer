@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { useParentElement } from "@vueuse/core";
+import { computed } from "vue";
+
 const {
     overflowScrollY = true,
     overflowScrollX = false,
@@ -16,11 +19,16 @@ const {
     hasGutter?: boolean;
     noGrow?: boolean;
 }>();
+
+const parent = useParentElement();
+const isFlexItem = computed(
+    () => parent.value && parent.value.computedStyleMap().get("display")?.toString() === "flex"
+);
 </script>
 
 <template>
     <div
-        class="h-full w-full min-h-0"
+        class="min-h-0"
         :class="[
             overflowScrollY && 'overflow-y-auto',
             overflowScrollX && 'overflow-x-auto',
@@ -30,6 +38,9 @@ const {
             center && 'items-center',
             center && 'justify-center',
             !noGrow && 'flex-grow',
+            {
+                'h-full w-full': !isFlexItem,
+            },
         ]"
         :style="{ scrollbarGutter: hasGutter ? 'stable' : 'auto' }"
     >

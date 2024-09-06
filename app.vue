@@ -1,10 +1,7 @@
+<script lang="ts"></script>
 <template>
+    <Toast position="bottom-right" />
     <NuxtLayout>
         <NuxtPage />
-        <UNotifications />
     </NuxtLayout>
 </template>
-
-<style lang="scss">
-@use "~/assets/_colors.scss";
-</style>

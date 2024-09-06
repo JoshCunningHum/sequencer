@@ -1,0 +1,13 @@
+* {
+    font-family: "DM Sans";
+}
+
+html {
+    font-size: 14px;
+}
+
+// Primevue Theming
+
+.p-button {
+    @apply px-3 py-1 rounded-sm;
+}

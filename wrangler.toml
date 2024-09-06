@@ -1,0 +1,5 @@
+[[d1_databases]]
+binding = "DB"
+database_name = "sequencer"
+database_id = "a4fb9b48-fdca-4c21-9540-638c97f8ecc2"
+migrations_dir = "./server/database/migrations"

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { get } from "@vueuse/core";
+import { computed, toRefs } from "vue";
+import Loading from "@/components/Loading.vue";
 
 // Types
 export type LoadingProcessState = {
@@ -31,9 +33,7 @@ const props = withDefaults(
 const { data: model } = toRefs(props);
 
 const isProcessesDone = (group: LoadingProcessGroup): boolean => {
-    return group.processes.every((p) =>
-        "processes" in p ? isProcessesDone(p) : p.status
-    );
+    return group.processes.every((p) => ("processes" in p ? isProcessesDone(p) : p.status));
 };
 
 const isDone = computed(() => {
@@ -54,23 +54,16 @@ const state_version = computed<LoadingProcessState>(() => {
 <template>
     <template v-if="typeof model === 'string'">
         <div class="flex gap-2 items-center DMSans">
-            <UIcon
-                class="animate-spin text-xl"
-                name="i-mdi-autorenew"
-            />
-            <span
-                v-if="!noText"
-                :class="`${!noEllipsis && 'loading-ellipsis'}`"
-                >{{ model }}</span
-            >
+            <i class="animate-spin pi pi-spinner" />
+            <span v-if="!noText" :class="`${!noEllipsis && 'loading-ellipsis'}`">{{ model }}</span>
         </div>
     </template>
     <template v-else-if="'status' in model">
         <div class="flex gap-2 items-center DMSans">
-            <UIcon
-                dynamic
-                :class="`${!isDone ? 'animate-spin' : 'text-green-500'} text-xl`"
-                :name="`${!isDone ? 'i-mdi-autorenew' : 'i-mdi-check'}`"
+            <i
+                :class="`${
+                    !isDone ? 'animate-spin pi pi-spinner' : 'text-green-500 pi pi-check-circle'
+                } text-xl`"
             />
             <span :class="`${!isDone && !noEllipsis && 'loading-ellipsis'}`">{{
                 model.label
@@ -78,22 +71,10 @@ const state_version = computed<LoadingProcessState>(() => {
         </div>
     </template>
     <template v-else>
-        <div class="flex flex-col gap-1 DMSans">
-            <Loading
-                :data="state_version"
-                :no-ellipsis="noEllipsis"
-                :no-spinner="noSpinner"
-            />
-            <div
-                class="pl-4"
-                :key="p.label"
-                v-for="p in model.processes"
-            >
-                <Loading
-                    :data="p"
-                    :no-ellipsis="noEllipsis"
-                    :no-spinner="noSpinner"
-                />
+        <div class="flex flex-col gap-2 DMSans">
+            <Loading :data="state_version" :no-ellipsis="noEllipsis" :no-spinner="noSpinner" />
+            <div class="pl-4" :key="p.label" v-for="p in model.processes">
+                <Loading :data="p" :no-ellipsis="noEllipsis" :no-spinner="noSpinner" />
             </div>
         </div>
     </template>
