@@ -4,6 +4,7 @@ import CredentialsProvider from "@auth/core/providers/credentials";
 import { loginSchema } from "~/schemas/auth";
 import * as yup from "yup";
 import { AuthConfig, User } from "@auth/core/types";
+import { skipCSRFCheck } from "@auth/core";
 
 const runtime_config = useRuntimeConfig();
 
@@ -38,6 +39,7 @@ export const authOptions: AuthConfig = {
             },
         }),
     ],
+    skipCSRFCheck: skipCSRFCheck,
 };
 
 export default NuxtAuthHandler(authOptions, runtime_config);
