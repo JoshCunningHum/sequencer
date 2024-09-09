@@ -48,6 +48,7 @@ export default defineNuxtConfig({
         //     },
         // }
         globalAppMiddleware: true,
+        originEnvKey: "AUTH_ORIGIN",
         origin: "/",
     },
 
@@ -83,6 +84,7 @@ export default defineNuxtConfig({
             GITHUB_CLIENT_ID: process.env.GITHUB_ID,
         },
         AUTH_SECRET: process.env.AUTH_SECRET,
+        AUTH_ORIGIN: import.meta.env.DEV ? "http://localhost:3000" : "https://sequencer.nuxt.dev",
     },
 
     build: {
