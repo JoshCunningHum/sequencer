@@ -94,10 +94,10 @@ const { isOverDropZone } = useDropZone(container, {
     <div
         ref="container"
         @click.self="() => open()"
-        class="flex min-h-10 cursor-pointer select-none items-center justify-center rounded border-2 border-dashed text-sm"
+        class="flex min-h-10 cursor-pointer select-none items-center justify-center rounded border border-dashed text-sm bg-surface-950"
         :class="{
             'py-3': files?.length,
-            'border-surface-600 text-surface-400 hover:bg-surface-700 active:bg-surface-600/50':
+            'border-surface-700 text-surface-400 hover:bg-surface-700 active:bg-surface-600/50':
                 !isOverDropZone,
             'border-primary-600 text-primary-400 hover:bg-primary-700 active:bg-primary-600/50':
                 isOverDropZone,

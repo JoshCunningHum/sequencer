@@ -113,6 +113,12 @@ watchImmediate(
                             mount: meta.mount,
                             type: meta.type,
                         });
+                    } else if (meta.type === "file") {
+                        Object.assign(field, {
+                            accept: meta.accept,
+                            type: meta.type,
+                            multiple: meta.multiple,
+                        });
                     } else {
                         field.type = meta.type;
                     }

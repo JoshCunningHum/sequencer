@@ -1,10 +1,9 @@
 import { getServerSession } from "#auth";
 import { users } from "../database/user";
 
-export default eventHandler(async (event) => {
+export default eventHandler(async (event): Promise<{ email: string; id: number } | null> => {
     const session = await getServerSession(event);
-
-    if (!session) return { status: "unauthenticated" };
+    if (!session) return null;
 
     const [user] = await useDrizzle()
         .select()
@@ -24,7 +23,7 @@ export default eventHandler(async (event) => {
             })
             .returning({ id: users.id });
 
-        return { email: email || "", id };
+        return { email: email || "" || "", id };
     }
 
     return { email: user.email, id: user.id };

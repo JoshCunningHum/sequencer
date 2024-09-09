@@ -9,6 +9,7 @@ export interface QueryState {
     description?: string;
     approveText?: string;
     rejectText?: string;
+    joinLabels?: boolean;
     schema?: yup.ObjectSchema<yup.AnyObject>;
     backdropClosing?: boolean;
     approve: (data: yup.AnyObject) => void;
@@ -23,6 +24,7 @@ interface QueryParams<Schema extends yup.AnyObject> {
     title?: string;
     description?: string;
     schema?: yup.ObjectSchema<Schema>;
+    joinLabels?: boolean;
     backdropClosing?: boolean;
     /**When approving/confirming, the UI will wait for this to finish */
     then?: (data: Schema) => Promise<void>;

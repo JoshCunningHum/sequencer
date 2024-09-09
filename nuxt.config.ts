@@ -1,9 +1,9 @@
-import PrimeVueStyle from "@primevue/themes/aura";
+import Theme from "./assets/preset";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: "2024-04-03",
-    devtools: { enabled: true },
+    devtools: { enabled: false },
 
     future: {
         compatibilityVersion: 4,
@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     primevue: {
         options: {
             theme: {
-                preset: PrimeVueStyle,
+                preset: Theme,
             },
             ripple: true,
         },

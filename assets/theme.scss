@@ -1,28 +1,27 @@
-$bg: #121212;
-
 * {
     font-family: "DM Sans";
 }
 
 html {
+    @apply bg-surface-900;
     font-size: 14px;
 }
 
 .bg {
-    background-color: $bg;
+    @apply bg-surface-900;
 }
 
 // Primevue Theming
+$border-radius: 4px;
 
 .p-button {
     @apply px-3 py-1 !important;
-    border-radius: 3px !important;
+    border-radius: $border-radius;
 }
 .p-inputtext {
     @apply py-1.5 px-2 !important;
-    border-radius: 3px !important;
+    border-radius: $border-radius !important;
 }
 .p-divider-content {
-    @apply px-4;
-    background-color: $bg;
+    @apply px-4 bg-surface-950 !important;
 }

@@ -9,8 +9,9 @@ const items = [
     {
         name: "cdudsd",
         icon: "pi pi-sparkles",
-        label: "CU+DU to SU Converter",
+        label: "Sequencer",
         route: "/dashboard",
+        tooltip: /* html */ `Convert class diagrams and use case diagrams to sequence diagrams`,
     },
     {
         name: "logout",
@@ -39,7 +40,7 @@ const avatar = computed(() => {
 </script>
 
 <template>
-    <Screen>
+    <Screen class="bg-surface-950/50">
         <Fill>
             <Sidenav :items class="bg">
                 <template #top>

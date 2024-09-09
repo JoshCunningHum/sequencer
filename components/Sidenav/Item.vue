@@ -45,10 +45,11 @@ const onClick = () => {
         v-slot="{ isActive, href, navigate }"
     >
         <div
-            class="flex cursor-pointer select-none items-center justify-center rounded bg-inherit p-3 text-surface-400 hover:bg-surface-700"
+            class="flex cursor-pointer select-none items-center justify-center rounded p-3 text-surface-400 item"
             :class="{ selected: isActive, 'not-selected': !isActive }"
             @click="onClick"
             v-ripple
+            v-tip="tooltip"
         >
             <template v-if="typeof item === 'number' || typeof item === 'string'">
                 <div class="label">
@@ -65,9 +66,10 @@ const onClick = () => {
     </RouterLink>
     <div
         v-else
-        class="flex cursor-pointer select-none items-center justify-center rounded bg-inherit p-3 text-surface-400 hover:bg-surface-700"
+        class="flex cursor-pointer select-none items-center justify-center rounded p-3 text-surface-400"
         @click="onClick"
         v-ripple
+        v-tip="tooltip"
     >
         <template v-if="typeof item === 'number' || typeof item === 'string'">
             <div class="label">
@@ -85,10 +87,14 @@ const onClick = () => {
 
 <style lang="scss" scoped>
 div.selected:not(.not-selected) {
-    @apply bg-surface-700/60 text-surface-200 hover:bg-surface-700;
+    @apply bg-surface-800/60 text-surface-200 hover:bg-surface-800;
 }
 
 .label {
     @apply w-full max-w-0 overflow-hidden font-semibold transition-all group-hover:max-w-7xl group-hover:pl-3 break-keep whitespace-nowrap;
+}
+
+.item {
+    @apply bg-inherit hover:bg-surface-900;
 }
 </style>

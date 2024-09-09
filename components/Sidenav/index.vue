@@ -38,10 +38,8 @@ const slots = defineSlots<{
 </script>
 
 <template>
-    <div class="relative h-full w-[55px] bg-inherit z-10">
-        <div
-            class="group absolute flex h-full flex-col min-w-[55px] border-r border-surface-600 bg-inherit p-2"
-        >
+    <div class="relative h-full w-[55px] z-10">
+        <div class="group absolute flex h-full flex-col min-w-[55px] bg-surface-950 p-2">
             <slot name="top"></slot>
             <div class="flex flex-grow flex-col gap-2">
                 <Item
