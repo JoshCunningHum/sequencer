@@ -16,6 +16,9 @@ type SignInPayload = yup.InferType<typeof loginSchema> & {
 
 export const authOptions: AuthConfig = {
     secret: runtime_config.authJs.secret,
+    pages: {
+        signIn: "/login",
+    },
     providers: [
         GitHubProvider({
             clientId: runtime_config.github.clientId,
