@@ -83,6 +83,7 @@ export default defineNuxtConfig({
             GITHUB_CLIENT_ID: process.env.GITHUB_ID,
         },
         AUTH_SECRET: process.env.AUTH_SECRET,
+        authOrigin: import.meta.env.PROD ? "https://sequencer.nuxt.dev" : "http://localhost:3000",
     },
 
     build: {
