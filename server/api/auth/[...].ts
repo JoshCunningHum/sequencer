@@ -1,8 +1,9 @@
 import { NuxtAuthHandler } from "#auth";
-import GitHubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "@auth/core/providers/github";
+import CredentialsProvider from "@auth/core/providers/credentials";
 import { loginSchema } from "~/schemas/auth";
 import * as yup from "yup";
+import { AuthConfig, User } from "@auth/core/types";
 
 const runtime_config = useRuntimeConfig();
 
@@ -12,23 +13,18 @@ type SignInPayload = yup.InferType<typeof loginSchema> & {
     json: boolean;
 };
 
-export default NuxtAuthHandler({
-    secret: runtime_config.AUTH_SECRET,
-    pages: {
-        signIn: "/login",
-    },
+export const authOptions: AuthConfig = {
+    secret: runtime_config.authJs.secret,
     providers: [
-        // @ts-expect-error You have to use .default for it to work during SSR daw
-        GitHubProvider.default({
-            clientId: runtime_config.public.GITHUB_CLIENT_ID,
-            clientSecret: runtime_config.GITHUB_CLIENT_SECRET,
+        GitHubProvider({
+            clientId: runtime_config.github.clientId,
+            clientSecret: runtime_config.github.clientSecret,
         }),
 
-        // @ts-expect-error You have to use .default for it to work during SSR daw
-        CredentialsProvider.default({
+        CredentialsProvider({
             name: "Credentials",
-            async authorize(credentials: SignInPayload) {
-                const { email, password } = credentials;
+            async authorize(credentials) {
+                const { email, password } = credentials as SignInPayload;
 
                 const [match] = await useDrizzle()
                     .select()
@@ -38,8 +34,10 @@ export default NuxtAuthHandler({
 
                 if (!match || match.password !== password) return null;
 
-                return { ...match, name: match.username };
+                return { ...match, name: match.username, id: String(match.id) } as User;
             },
         }),
     ],
-});
+};
+
+export default NuxtAuthHandler(authOptions, runtime_config);

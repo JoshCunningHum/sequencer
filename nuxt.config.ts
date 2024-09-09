@@ -18,7 +18,7 @@ export default defineNuxtConfig({
         "@nuxtjs/tailwindcss",
         "@nuxt/fonts",
         "nuxt-typed-router",
-        "@sidebase/nuxt-auth",
+        "@hebilicious/authjs-nuxt",
     ],
 
     primevue: {
@@ -84,12 +84,30 @@ export default defineNuxtConfig({
                 propsDestructure: true,
             },
         },
+
+        optimizeDeps: {
+            include: ["@auth/core"],
+        },
     },
 
     runtimeConfig: {
+        authJs: {
+            secret: process.env.AUTH_SECRET, // You can generate one with `openssl rand -base64 32`
+        },
+        github: {
+            clientId: process.env.GITHUB_ID,
+            clientSecret: process.env.GITHUB_SECRET,
+        },
         GITHUB_CLIENT_SECRET: process.env.GITHUB_SECRET,
         public: {
             GITHUB_CLIENT_ID: process.env.GITHUB_ID,
+            authJs: {
+                baseURL:
+                    process.env.NODE_ENV === "development"
+                        ? "http://localhost:3000/api/auth"
+                        : "https://sequencer.nuxt.dev/api/auth", // The URL of your deployed app (used for origin Check in production),
+                verifyClientOnEveryRequest: false,
+            },
         },
         AUTH_SECRET: process.env.AUTH_SECRET,
         AUTH_ORIGIN: import.meta.env.DEV ? "http://localhost:3000" : "https://sequencer.nuxt.dev",

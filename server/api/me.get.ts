@@ -1,8 +1,9 @@
 import { getServerSession } from "#auth";
+import { authOptions } from "./auth/[...]";
 import { users } from "../database/user";
 
 export default eventHandler(async (event): Promise<{ email: string; id: number } | null> => {
-    const session = await getServerSession(event);
+    const session = await getServerSession(event, authOptions);
     if (!session) return null;
 
     const [user] = await useDrizzle()

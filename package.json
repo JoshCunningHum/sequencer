@@ -1,5 +1,5 @@
 {
-    "name": "nuxt-app",
+    "name": "sequencer-v2",
     "private": true,
     "type": "module",
     "scripts": {
@@ -12,13 +12,13 @@
         "migrate": "wrangler d1 migrations apply D1"
     },
     "dependencies": {
+        "@auth/core": "^0.17.0",
+        "@hebilicious/authjs-nuxt": "^0.3.5",
         "@nuxt/fonts": "^0.7.2",
         "@nuxthub/core": "^0.7.9",
         "@primevue/themes": "^4.0.5",
-        "@sidebase/nuxt-auth": "^0.6.7",
         "@vueuse/core": "^11.0.3",
         "drizzle-orm": "^0.33.0",
-        "next-auth": "^4.21.1",
         "nuxt": "^3.13.0",
         "nuxt-build-cache": "^0.1.1",
         "nuxt-typed-router": "^3.6.5",

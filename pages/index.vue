@@ -2,12 +2,7 @@
 const route = useRoute();
 const isHome = computed(() => route.path === "/");
 
-definePageMeta({
-    auth: {
-        unauthenticatedOnly: true,
-        navigateAuthenticatedTo: "/dashboard",
-    },
-});
+definePageMeta({ middleware: "guest-only", auth: { authenticatedRedirectTo: "/dashboard" } });
 </script>
 
 <template>

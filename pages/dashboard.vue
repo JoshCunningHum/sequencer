@@ -1,6 +1,10 @@
 <script setup lang="ts">
 definePageMeta({
     layout: "authenticated",
+    middleware: "auth",
+    auth: {
+        guestRedirectTo: "/login",
+    },
 });
 
 const route = useRoute();

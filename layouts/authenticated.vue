@@ -23,18 +23,18 @@ const items = [
     },
 ] as const as SidebarItem[];
 
-const { data } = useAuth();
+const { user } = useAuth();
 const initials = computed(() =>
-    !!data.value?.user?.image
+    !!user.value?.image
         ? undefined
-        : (data.value?.user?.name || "")
+        : (user.value?.name || "")
               .split(" ")
               .map(([f]) => f)
               .join("")
               .toUpperCase()
 );
 const avatar = computed(() => {
-    const { image } = data.value?.user || {};
+    const { image } = user.value || {};
     return image || undefined;
 });
 </script>
@@ -50,9 +50,9 @@ const avatar = computed(() => {
                             class="group-hover:max-w-52 transition-all max-w-0 overflow-hidden group-hover:ml-3 flex flex-col"
                         >
                             <span class="break-keep whitespace-nowrap text-lg">
-                                {{ data?.user?.name }}</span
+                                {{ user?.name }}</span
                             >
-                            <span class="text-sm text-surface-400">{{ data?.user?.email }}</span>
+                            <span class="text-sm text-surface-400">{{ user?.email }}</span>
                         </div>
                     </div>
                     <Divider class="!my-1 !mb-2" />
