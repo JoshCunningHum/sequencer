@@ -1,5 +1,5 @@
 [[d1_databases]]
 binding = "DB"
 database_name = "sequencer"
-database_id = "a4fb9b48-fdca-4c21-9540-638c97f8ecc2"
+database_id = "ee9048e8-671a-42c5-b391-2c32e40cc103"
 migrations_dir = "./server/database/migrations"
