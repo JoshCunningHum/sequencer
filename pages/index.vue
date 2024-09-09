@@ -1,6 +1,13 @@
 <script setup lang="ts">
 const route = useRoute();
 const isHome = computed(() => route.path === "/");
+
+definePageMeta({
+    auth: {
+        unauthenticatedOnly: true,
+        navigateAuthenticatedTo: "/dashboard",
+    },
+});
 </script>
 
 <template>

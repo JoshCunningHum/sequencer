@@ -3,7 +3,7 @@ import PrimeVueStyle from "@primevue/themes/aura";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: "2024-04-03",
-    devtools: { enabled: false },
+    devtools: { enabled: true },
 
     future: {
         compatibilityVersion: 4,
@@ -35,7 +35,20 @@ export default defineNuxtConfig({
     },
 
     auth: {
-        isEnabled: false,
+        // provider: {
+        //     type: "local",
+        //     endpoints: {
+        //         signIn: { path: "/login", method: "post" },
+        //         signOut: { path: "/logout", method: "post" },
+        //         signUp: { path: "/register", method: "post" },
+        //         getSession: { path: "/session", method: "get" },
+        //     },
+        //     pages: {
+        //         login: "/login",
+        //     },
+        // }
+        globalAppMiddleware: true,
+        origin: "/",
     },
 
     app: {
@@ -62,6 +75,14 @@ export default defineNuxtConfig({
                 propsDestructure: true,
             },
         },
+    },
+
+    runtimeConfig: {
+        GITHUB_CLIENT_SECRET: process.env.GITHUB_SECRET,
+        public: {
+            GITHUB_CLIENT_ID: process.env.GITHUB_ID,
+        },
+        AUTH_SECRET: process.env.AUTH_SECRET,
     },
 
     build: {

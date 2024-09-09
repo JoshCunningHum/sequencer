@@ -20,15 +20,15 @@ const {
                     life: 2000,
                 })
             )
-            .catch((err) =>
+            .catch((err) => {
                 toast.add({
                     severity: "error",
                     summary: "Registration Failed",
                     detail: err.statusMessage,
                     closable: true,
                     life: 2000,
-                })
-            ),
+                });
+            }),
     undefined,
     { immediate: false }
 );

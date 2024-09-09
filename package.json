@@ -18,6 +18,7 @@
         "@sidebase/nuxt-auth": "^0.6.7",
         "@vueuse/core": "^11.0.3",
         "drizzle-orm": "^0.33.0",
+        "next-auth": "^4.21.1",
         "nuxt": "^3.13.0",
         "nuxt-build-cache": "^0.1.1",
         "nuxt-typed-router": "^3.6.5",
@@ -33,7 +34,8 @@
         "@pinia/nuxt": "^0.5.4",
         "@primevue/nuxt-module": "^4.0.5",
         "@vueuse/nuxt": "^11.0.3",
-        "drizzle-kit": "^0.21.4",
+        "cross-env": "^7.0.3",
+        "drizzle-kit": "^0.24.2",
         "sass": "^1.78.0",
         "wrangler": "^3.74.0"
     }

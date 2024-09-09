@@ -3,12 +3,14 @@ import { get, set, useArrayFilter, watchDeep, watchImmediate } from "@vueuse/cor
 import { computed, provide, ref, toRaw, unref } from "vue";
 import * as yup from "yup";
 import { type QueryField, type QueryInfer, isSchemaMeta } from "./types";
+import { safeTry } from "~/utils/safeTry";
 
 const props = defineProps<{
     schema: yup.ObjectSchema<Schema>;
     confirmText?: string;
     isSubmitting?: boolean;
     joinLabels?: boolean;
+    confirmButtonClasses?: string;
 }>();
 
 const emits = defineEmits<{
@@ -55,12 +57,10 @@ const hasErrors = computed(() => Object.keys(errors.value).length !== 0);
 
 // Validate on change
 watchDeep(state, (v) => {
-    try {
-        props.schema.validateSync(v, { abortEarly: false });
-        set(errors, {});
-    } catch (e) {
-        set(errors, transformYupErrorsIntoObject(e as yup.ValidationError));
-    }
+    const [err] = safeTry(() => props.schema.validateSync(v, { abortEarly: false }));
+
+    if (!err) set(errors, {});
+    else set(errors, transformYupErrorsIntoObject(err as yup.ValidationError));
 });
 
 watchImmediate(
@@ -164,6 +164,7 @@ const onSubmit = () => {
                 type="submit"
                 :loading="props.isSubmitting"
                 :label="confirmText || 'Confirm'"
+                :class="confirmButtonClasses"
             />
         </div>
     </form>
