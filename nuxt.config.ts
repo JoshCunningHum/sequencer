@@ -48,9 +48,10 @@ export default defineNuxtConfig({
         //     },
         // }
         globalAppMiddleware: true,
-        baseURL: import.meta.env.DEV
-            ? "http://localhost:3000/api/auth"
-            : "https://sequencer.nuxt.dev/api/auth",
+        baseURL:
+            process.env.NODE_ENV === "development"
+                ? "http://localhost:3000/api/auth"
+                : "https://sequencer.nuxt.dev/api/auth",
     },
 
     app: {
@@ -70,6 +71,12 @@ export default defineNuxtConfig({
     },
 
     css: ["~/assets/theme.scss", "primeicons/primeicons.css"],
+
+    nitro: {
+        experimental: {
+            openAPI: true,
+        },
+    },
 
     vite: {
         vue: {
