@@ -48,8 +48,9 @@ export default defineNuxtConfig({
         //     },
         // }
         globalAppMiddleware: true,
-        originEnvKey: "AUTH_ORIGIN",
-        origin: "/",
+        baseURL: import.meta.env.DEV
+            ? "http://localhost:3000/api/auth"
+            : "https://sequencer.nuxt.dev/api/auth",
     },
 
     app: {
