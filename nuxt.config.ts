@@ -34,21 +34,11 @@ export default defineNuxtConfig({
         database: true,
     },
 
-    auth: {
-        // provider: {
-        //     type: "local",
-        //     endpoints: {
-        //         signIn: { path: "/login", method: "post" },
-        //         signOut: { path: "/logout", method: "post" },
-        //         signUp: { path: "/register", method: "post" },
-        //         getSession: { path: "/session", method: "get" },
-        //     },
-        //     pages: {
-        //         login: "/login",
-        //     },
-        // }
-        globalAppMiddleware: true,
-        baseURL:
+    authJs: {
+        verifyClientOnEveryRequest: false,
+        guestRedirectTo: "/",
+        authenticatedRedirectTo: "/dashboard",
+        baseUrl:
             process.env.NODE_ENV === "development"
                 ? "http://localhost:3000/api/auth"
                 : "https://sequencer.nuxt.dev/api/auth",
