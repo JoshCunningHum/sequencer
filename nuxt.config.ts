@@ -41,7 +41,7 @@ export default defineNuxtConfig({
         baseUrl:
             process.env.NODE_ENV === "development"
                 ? "http://localhost:3000/api/auth"
-                : "https://sequencer.nuxt.dev/api/auth",
+                : "https://sequencer.nuxt.dev",
     },
 
     app: {
