@@ -95,6 +95,6 @@ div.selected:not(.not-selected) {
 }
 
 .item {
-    @apply bg-inherit hover:bg-surface-900;
+    @apply bg-inherit hover:bg-surface-900 transition-all min-w-0 group-hover:min-w-60;
 }
 </style>
