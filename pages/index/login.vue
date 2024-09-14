@@ -2,11 +2,20 @@
 import * as yup from "yup";
 import { loginSchema as schema } from "~/schemas/auth";
 
+const toast = useToast();
 const { signIn } = useAuth();
 
 const { isLoading, execute } = useAsyncState(
     async (body: yup.InferType<typeof schema>) => {
-        return await signIn("credentials", { ...body, redirect: true });
+        return await signIn("credentials", { ...body, redirect: true }).catch(() =>
+            toast.add({
+                closable: true,
+                detail: "Invalid Credentials",
+                life: 1500,
+                severity: "error",
+                summary: "Login Failed",
+            })
+        );
     },
     undefined,
     { immediate: false }
@@ -18,22 +27,6 @@ const onSubmit = (state: yup.InferType<typeof schema>) => execute(0, state);
 const onGithub = () => signIn("github", { redirect: true });
 
 //#region Display Error after call back
-const toast = useToast();
-const params = useUrlSearchParams("history");
-
-onMounted(() => {
-    switch (params.error) {
-        case "CredentialsSignin":
-            toast.add({
-                closable: true,
-                detail: "Invalid Credentials",
-                life: 1500,
-                severity: "error",
-                summary: "Login Failed",
-            });
-            break;
-    }
-});
 </script>
 
 <template>

@@ -1,10 +1,10 @@
 import { NuxtAuthHandler } from "#auth";
-import GitHubProvider from "@auth/core/providers/github";
-import CredentialsProvider from "@auth/core/providers/credentials";
-import { loginSchema } from "~/schemas/auth";
-import * as yup from "yup";
-import { AuthConfig, User } from "@auth/core/types";
 import { skipCSRFCheck } from "@auth/core";
+import CredentialsProvider from "@auth/core/providers/credentials";
+import GitHubProvider from "@auth/core/providers/github";
+import { AuthConfig, User } from "@auth/core/types";
+import * as yup from "yup";
+import { loginSchema } from "~/schemas/auth";
 
 const runtime_config = useRuntimeConfig();
 
