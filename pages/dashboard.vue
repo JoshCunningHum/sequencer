@@ -9,6 +9,8 @@ definePageMeta({
 
 const route = useRoute();
 const isExact = computed(() => route.path === "/dashboard");
+
+onMounted(() => (useUiStore().minimized_sidebar = false));
 </script>
 
 <template>

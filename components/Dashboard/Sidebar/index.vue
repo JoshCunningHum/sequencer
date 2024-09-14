@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { set } from "@vueuse/core";
 import type { Project } from "~/server/database/project";
+import ContextMenu from "./Context.vue";
 
 const projectStore = useProjectsStore();
 const { projects, isFetching } = storeToRefs(projectStore);
@@ -11,13 +12,8 @@ const filtered_projects = useArrayFilter(projects, (p) =>
 );
 
 //#region Project navigation
-const route = useRoute();
-
-const currentProject = computed(() => {
-    const cr = route.params as { id: number };
-    if ("id" in cr) return Number(cr.id);
-    return -1;
-});
+const route = useRoute("dashboard-id");
+const currentProject = computed(() => Number(route.params.id));
 
 const navigate = (p: Project) => {
     navigateTo(`/dashboard/${p.id}`);
@@ -30,6 +26,11 @@ const { minimized_sidebar } = storeToRefs(uiStore);
 const container = useTemplateRef<HTMLDivElement>("container");
 const { width } = useElementSize(container);
 onMounted(() => set(mounted, true));
+
+//#region Context menu
+const contextmenu = ref<InstanceType<typeof ContextMenu>>();
+const showContextMenu = (event: MouseEvent, project: Project) =>
+    contextmenu.value?.show(event, project);
 </script>
 
 <template>
@@ -40,19 +41,14 @@ onMounted(() => set(mounted, true));
                 <InputText placeholder="Search projects..." class="!pl-9 w-full" v-model="search" />
             </IconField>
             <Loader :finished="!isFetching">
-                <Fill v-if="projects.length" flex-col class="gap-1">
-                    <div
+                <Fill v-if="projects.length" overflow-scroll-y flex-col class="gap-1">
+                    <DashboardSidebarItem
                         v-for="project in filtered_projects"
-                        class="item"
-                        v-ripple
-                        @click="navigate(project)"
-                        :class="{
-                            selected: currentProject === project.id,
-                        }"
-                    >
-                        <i class="pi pi-file" />
-                        <div>{{ project.name }}</div>
-                    </div>
+                        :key="project.id"
+                        :project
+                        @context="showContextMenu"
+                    />
+                    <DashboardSidebarContext ref="contextmenu" />
                 </Fill>
                 <Empty v-if="projects?.length === 0" text="No projects" class="text-surface-400" />
             </Loader>
@@ -75,14 +71,6 @@ onMounted(() => set(mounted, true));
 
     &.minimized {
         max-width: 0px;
-    }
-}
-
-.item {
-    @apply flex gap-2 items-center px-3 py-1.5 rounded-sm hover:bg-surface-900 cursor-pointer text-surface-400;
-
-    &.selected {
-        @apply bg-surface-800/80 hover:bg-surface-800 text-surface-200;
     }
 }
 </style>

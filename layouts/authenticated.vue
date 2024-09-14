@@ -14,6 +14,13 @@ const items = [
         tooltip: /* html */ `Convert class diagrams and use case diagrams to sequence diagrams`,
     },
     {
+        name: "useclass",
+        icon: "pi pi-credit-card",
+        label: "Useclass",
+        route: "/useclass",
+        tooltip: /* html */ `Use-class integration from the bontilao twins sheesh`,
+    },
+    {
         name: "logout",
         label: "Log out",
         last: true,
@@ -37,6 +44,9 @@ const avatar = computed(() => {
     const { image } = user.value || {};
     return image || undefined;
 });
+
+const { sync } = useUserStore();
+onMounted(() => sync());
 </script>
 
 <template>

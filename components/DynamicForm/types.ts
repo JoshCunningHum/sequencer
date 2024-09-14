@@ -65,6 +65,7 @@ export type QuerySchemaMeta<V = any> = {
           accept?: string;
           multiple?: boolean;
           show?: boolean;
+          base64?: boolean;
       }
     | {
           type: "directory";

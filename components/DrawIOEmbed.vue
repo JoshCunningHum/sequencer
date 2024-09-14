@@ -2,6 +2,11 @@
 import { set } from "@vueuse/core";
 
 // Props and Emits
+
+const model = defineModel<string>({
+    default: "",
+});
+
 const {
     noAutosave = false,
     saving = false,
@@ -16,10 +21,6 @@ const emit = defineEmits<{
     (e: "loaded"): void;
     (e: "save", data: string): void;
 }>();
-
-const model = defineModel<string>({
-    default: "",
-});
 
 // DrawIO Source Config
 
@@ -112,15 +113,6 @@ watch(model, (xml) => setXML(xml));
 
 <template>
     <Fill class="relative rounded-lg overflow-hidden my-2">
-        <div v-if="!loaded" class="absolute z-10 w-full h-full flex justify-center items-center bg">
-            <Loading data="Loading DrawIO UI" />
-        </div>
-        <div
-            v-else-if="saving"
-            class="absolute z-10 w-full h-full flex justify-center items-center bg opacity-60"
-        >
-            <Loading data="Saving Data" />
-        </div>
         <iframe
             :allowtransparency="true"
             ref="frame"
@@ -129,6 +121,16 @@ watch(model, (xml) => setXML(xml));
             :src="`${embedlink}/?${params_processed}`"
             :frameborder="0"
         />
+
+        <div v-if="!loaded" class="absolute w-full h-full flex justify-center items-center bg">
+            <Loading data="Loading DrawIO UI" />
+        </div>
+        <div
+            v-else-if="saving"
+            class="absolute w-full h-full flex justify-center items-center bg opacity-60"
+        >
+            <Loading data="Saving Data" />
+        </div>
     </Fill>
 </template>
 

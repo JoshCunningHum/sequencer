@@ -4,18 +4,21 @@ import { loginSchema as schema } from "~/schemas/auth";
 
 const toast = useToast();
 const { signIn } = useAuth();
+const { sync } = useUserStore();
 
 const { isLoading, execute } = useAsyncState(
     async (body: yup.InferType<typeof schema>) => {
-        return await signIn("credentials", { ...body, redirect: true }).catch(() =>
-            toast.add({
-                closable: true,
-                detail: "Invalid Credentials",
-                life: 1500,
-                severity: "error",
-                summary: "Login Failed",
-            })
-        );
+        return await signIn("credentials", { ...body, redirect: true })
+            .then(async () => await sync())
+            .catch(() =>
+                toast.add({
+                    closable: true,
+                    detail: "Invalid Credentials",
+                    life: 1500,
+                    severity: "error",
+                    summary: "Login Failed",
+                })
+            );
     },
     undefined,
     { immediate: false }

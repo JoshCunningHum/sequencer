@@ -118,6 +118,7 @@ watchImmediate(
                             accept: meta.accept,
                             type: meta.type,
                             multiple: meta.multiple,
+                            base64: meta.base64,
                         });
                     } else {
                         field.type = meta.type;

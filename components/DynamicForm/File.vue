@@ -10,6 +10,7 @@ const prop = withDefaults(
         accept?: string;
         directory?: boolean;
         multiple?: boolean;
+        base64?: boolean;
     }>(),
     {
         accept: "image/*",
@@ -50,10 +51,14 @@ onChange(async (files) => {
     }
 });
 
-watch(base64s, (b64s) => {
+watch([base64s], ([b64s]) => {
     // TODO: Implement multiple acquisition
-    const [first] = b64s;
-    if (first) set(model, first);
+    if (prop.base64) {
+        const [first] = b64s;
+        if (first) set(model, first);
+    } else if (files.value) {
+        files.value[0]?.text().then((value) => set(model, value));
+    }
 });
 
 // Deleting of an item

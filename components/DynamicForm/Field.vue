@@ -66,6 +66,7 @@ const error = computed(() =>
                 v-model="field.value"
                 :accept="field.accept!"
                 :multiple="field.multiple"
+                :base64="field.base64"
             />
             <DynamicFormFile v-else-if="field.type === 'directory'" :directory="true" />
             <DynamicFormCustom

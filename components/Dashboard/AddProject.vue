@@ -34,8 +34,7 @@ const addProject = () => {
         }),
         joinLabels: true,
         then: async (body) => {
-            const headers = useRequestHeaders(["cookie"]) as HeadersInit;
-            const [_, user] = await safeAwait($fetch("/api/me", { method: "GET", headers }));
+            const { user } = useUserStore();
 
             const [err, res] = await safeAwait(
                 $fetch("/api/projects/add", {
