@@ -26,7 +26,10 @@ export default defineEventHandler(async (event) => {
     const { class: c, sequence, usecase, name } = body;
 
     // Update the project
-    await useDrizzle().update(tables.projects).set({ class: c, sequence, usecase, name });
+    await useDrizzle()
+        .update(tables.projects)
+        .set({ class: c, sequence, usecase, name })
+        .where(eq(tables.projects.id, project_id));
 
     return true;
 });

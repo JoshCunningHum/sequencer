@@ -9,28 +9,43 @@ definePageMeta({
 const route = useRoute("dashboard-id");
 const id = computed(() => Number(route.params.id));
 
-// Project Info
-const projectStore = useProjectsStore();
-const { projects } = storeToRefs(projectStore);
-
 // Drawio XML data to be displayed
+const drawIOStore = useDrawioStore();
+const { xml: prioxml } = storeToRefs(drawIOStore);
+
 const uiStore = useUiStore();
-const { sequencer_tab } = storeToRefs(uiStore);
+const { diagram } = storeToRefs(uiStore);
+
+const generationStore = useGenerationStore();
+const { project } = storeToRefs(generationStore);
+const update = generationStore.update;
 
 const xml = computed(() => {
-    const project = projects.value.find((p) => p.id === id.value); // always true because of middleware
-    const tab = sequencer_tab.value;
-    if (!project) return "";
-    return project[tab];
+    if (diagram.value === "sequence") return prioxml.value || project.value?.sequence || "";
+    return project.value?.[diagram.value] || "";
 });
+
+// Handle savings
+const { isLoading: isSaving, execute: save } = useAsyncState(update, false, { immediate: false });
+const onSave = (data: string) => {
+    const p = project.value;
+    const tab = diagram.value;
+    if (!p) return;
+
+    p[tab] = data;
+    save();
+};
 </script>
 
 <template>
-    <Fill flex-col class="py-1 pl-2">
+    <Fill flex-col class="py-1 pl-2" :overflow-scroll-y="false">
         <DashboardToolbar />
-        <KeepAlive>
-            <DrawIOEmbed v-model="xml" />
-        </KeepAlive>
+        <Fill :overflow-scroll-y="false">
+            <KeepAlive>
+                <DrawIOEmbed :saving="isSaving" :model-value="xml" @save="onSave" />
+            </KeepAlive>
+            <SequenceSection />
+        </Fill>
     </Fill>
 </template>
 

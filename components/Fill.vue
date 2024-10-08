@@ -21,9 +21,7 @@ const {
 }>();
 
 const parent = useParentElement();
-const isFlexItem = computed(
-    () => parent.value && parent.value.computedStyleMap().get("display")?.toString() === "flex"
-);
+const isFlexItem = computed(() => parent.value && parent.value.style.display === "flex");
 </script>
 
 <template>

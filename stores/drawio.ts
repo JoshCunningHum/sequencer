@@ -1,7 +1,7 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 
 export const useDrawioStore = defineStore("drawio", () => {
-    const xml = ref("");
+    const xml = ref<string | undefined>();
 
     return { xml };
 });

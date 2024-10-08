@@ -43,6 +43,8 @@ export const useProjectsStore = defineStore("projects", () => {
         return res;
     };
 
+    watchDeep(user, () => sync());
+
     return { projects, isFetching, sync, remove, update };
 });
 

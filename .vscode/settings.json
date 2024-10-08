@@ -13,5 +13,8 @@
     "nuxtr.intellisense.nuxtrc": true,
     "nuxtr.intellisense.vueFiles": true,
     "nuxtr.intellisense.nuxtignore": true,
-    "tailwindCSS.experimental.configFile": "tailwind.config.ts"
+    "tailwindCSS.experimental.configFile": "tailwind.config.ts",
+    "css.customData": [".vscode/tailwind.json"],
+    "scss.lint.unknownAtRules": "ignore",
+    "css.lint.unknownAtRules": "ignore"
 }

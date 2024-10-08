@@ -22,6 +22,7 @@ const addProject = () => {
                 .meta({
                     type: "file",
                     accept: ".xml",
+                    base64: false,
                 } as QuerySchemaMeta),
             usecase: yup
                 .string()
@@ -30,11 +31,15 @@ const addProject = () => {
                 .meta({
                     type: "file",
                     accept: ".xml",
+                    base64: false,
                 } as QuerySchemaMeta),
         }),
         joinLabels: true,
         then: async (body) => {
             const { user } = useUserStore();
+
+            console.log(body);
+            return;
 
             const [err, res] = await safeAwait(
                 $fetch("/api/projects/add", {

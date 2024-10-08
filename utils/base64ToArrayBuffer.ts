@@ -5,5 +5,5 @@
  */
 export default (string: string) => {
     const str = string.includes(",") ? string.split(",")[1] : string;
-    return Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
+    return Uint8Array.from(atob(str!), (c) => c.charCodeAt(0));
 };

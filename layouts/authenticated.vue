@@ -31,6 +31,7 @@ const items = [
 ] as const as SidebarItem[];
 
 const { user } = useAuth();
+
 const initials = computed(() =>
     !!user.value?.image
         ? undefined

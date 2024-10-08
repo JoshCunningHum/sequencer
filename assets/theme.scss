@@ -1,14 +1,18 @@
-* {
+body {
     font-family: "DM Sans";
 }
 
 html {
-    @apply bg-surface-900;
+    @apply bg-surface-900 overflow-hidden;
     font-size: 14px;
 }
 
 .bg {
     @apply bg-surface-900;
+}
+
+.label {
+    @apply text-sm text-surface-300;
 }
 
 // Primevue Theming

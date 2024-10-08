@@ -1,14 +1,18 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 
 export type SequencerXMLTypes = "class" | "usecase" | "sequence";
+export type SidebarViews = "generate" | "info";
 
 export const useUiStore = defineStore("ui", () => {
     const minimized_sidebar = ref(false);
-    const sequencer_tab = ref<SequencerXMLTypes>("class");
+
+    const diagram = ref<SequencerXMLTypes>("class");
+    const sidebar_tab = ref<SidebarViews>();
 
     return {
         minimized_sidebar,
-        sequencer_tab,
+        diagram,
+        sidebar_tab,
     };
 });
 

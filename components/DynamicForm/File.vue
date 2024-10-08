@@ -57,7 +57,9 @@ watch([base64s], ([b64s]) => {
         const [first] = b64s;
         if (first) set(model, first);
     } else if (files.value) {
-        files.value[0]?.text().then((value) => set(model, value));
+        files.value[0]?.text().then((value) => {
+            set(model, value);
+        });
     }
 });
 

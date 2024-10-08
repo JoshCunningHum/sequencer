@@ -112,7 +112,7 @@ watch(model, (xml) => setXML(xml));
 </script>
 
 <template>
-    <Fill class="relative rounded-lg overflow-hidden my-2">
+    <Fill class="relative rounded-md overflow-hidden my-1">
         <iframe
             :allowtransparency="true"
             ref="frame"

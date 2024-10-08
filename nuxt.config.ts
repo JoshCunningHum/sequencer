@@ -1,4 +1,5 @@
 import Theme from "./assets/preset";
+import { resolve } from "node:path";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -110,5 +111,9 @@ export default defineNuxtConfig({
                 config.devtool = ctx.isClient ? "source-map" : "inline-source-map";
             }
         },
+    },
+
+    alias: {
+        cookie: resolve(__dirname, "node_modules/cookie"),
     },
 });
