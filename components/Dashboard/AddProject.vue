@@ -38,9 +38,6 @@ const addProject = () => {
         then: async (body) => {
             const { user } = useUserStore();
 
-            console.log(body);
-            return;
-
             const [err, res] = await safeAwait(
                 $fetch("/api/projects/add", {
                     method: "POST",
