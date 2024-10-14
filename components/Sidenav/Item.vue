@@ -4,6 +4,7 @@ import Hotkey from "../Hotkey.vue";
 import type { SidebarItem } from "./types";
 // ! Remove when no vue router installed
 import { useRouter, RouterLink } from "vue-router";
+import type { TooltipValue } from "~/plugins/tooltip";
 
 const props = defineProps<{
     item: string | number | SidebarItem;
@@ -23,7 +24,7 @@ const tooltip = computed(() => {
     return {
         text: item.tooltip || "",
         hotkey: item.hotkey,
-    };
+    } as TooltipValue;
 });
 
 //#region Handle clicking

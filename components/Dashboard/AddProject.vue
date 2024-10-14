@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { QuerySchemaMeta } from "../DynamicForm/types";
 import * as yup from "yup";
+import { useQuery } from "@/composables/query";
 
 const toast = useToast();
 const projectStore = useProjectsStore();
@@ -41,7 +42,12 @@ const addProject = () => {
             const [err, res] = await safeAwait(
                 $fetch("/api/projects/add", {
                     method: "POST",
-                    body: { ...body, id: user?.id || -1 },
+                    body: {
+                        id: user?.id || -1,
+                        projectName: body.projectName,
+                        class: body.class,
+                        usecase: body.usecase,
+                    },
                 })
             );
 

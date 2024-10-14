@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { set } from "@vueuse/core";
 import type { Project } from "~/server/database/project";
 
 const { project } = defineProps<{
@@ -16,19 +17,28 @@ const navigate = (p: Project) => {
 const emits = defineEmits<{
     (e: "context", event: MouseEvent, project: Project): void;
 }>();
+
+// On item click
+const has_clicked = ref(false);
+const onClick = () => {
+    set(has_clicked, true);
+    navigate(project);
+};
+const is_loading = computed(() => has_clicked.value && !route.params.id);
+const left_icon = computed(() => `pi pi-${is_loading.value ? "spinner animate-spin" : "file"}`);
 </script>
 
 <template>
     <div
         class="item group"
         v-ripple
-        @click="navigate(project)"
+        @click="onClick"
         :class="{
             selected: currentProject === project.id,
         }"
         @contextmenu="emits('context', $event, project)"
     >
-        <i class="pi pi-file" />
+        <i :class="[left_icon]" />
         <div class="label">{{ project.name }}</div>
         <i
             class="pi pi-ellipsis-v !text-xs ml-auto px-1.5 pt-1 pb-0.5 rounded-full"

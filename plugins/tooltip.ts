@@ -15,6 +15,7 @@ export type TooltipValue =
                 };
           delay?: number;
           offset?: [number, number];
+          quadrant?: "top-left" | "top-right" | "bot-left" | "bot-right";
       }
     | string;
 

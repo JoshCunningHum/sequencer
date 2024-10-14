@@ -4,7 +4,9 @@ import TestBtn from "./TestBtn.vue";
 //#region Opening
 const uiStore = useUiStore();
 const { diagram, sidebar_tab: side_tab } = storeToRefs(uiStore);
-const open = computed(() => diagram.value === "sequence" || side_tab.value !== "generate");
+const open = computed(
+    () => !!side_tab.value && (diagram.value === "sequence" || side_tab.value !== "generate")
+);
 
 const generationStore = useGenerationStore();
 const { is_generating } = storeToRefs(generationStore);

@@ -7,6 +7,7 @@ const { generate } = generationStore;
     <div class="min-w-96 flex flex-col">
         <label class="label">Generation options</label>
         <SequenceConfigStrictMode />
+        <SequenceConfigMaxGenerationLimit />
         <Divider />
         <Button fluid icon="pi pi-sparkles" label="Generate" @click="generate()" />
     </div>

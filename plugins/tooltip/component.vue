@@ -59,7 +59,7 @@ const hotkey = computed(() => {
     if (typeof hotkey === "string") return { Hotkey: hotkey };
     return hotkey;
 });
-const offset = computed(() => data.value?.offset || [16, 21]);
+const offset = computed(() => (data.value?.offset || [16, 21]) as [number, number]);
 
 //#region Computed Positioning
 const container = ref<InstanceType<typeof HTMLDivElement>>();
@@ -72,9 +72,18 @@ const isYOverlap = computed(
 const isXOverlap = computed(() => mX.value + offset.value[0]! + width.value > maxX.value - PADDING);
 
 /**Computed X */
-const x = computed(() => mX.value - (isXOverlap.value ? width.value + offset.value[0]! * 2 : 0));
+const x = computed(() => {
+    const isLeft =
+        (data.value?.quadrant && data.value.quadrant.includes("left")) || isXOverlap.value;
+    const comp_offset = isLeft ? width.value + offset.value[0]! * 2 : 0;
+    return mX.value - comp_offset;
+});
 /**Computed Y */
-const y = computed(() => mY.value - (isYOverlap.value ? height.value + offset.value[1]! * 2 : 0));
+const y = computed(() => {
+    const isTop = (data.value?.quadrant && data.value.quadrant.includes("top")) || isYOverlap.value;
+    const comp_offset = isTop ? height.value + offset.value[1] * 2 : 0;
+    return mY.value - comp_offset;
+});
 
 //#region Tooltip Visibility
 const lbl = ref<InstanceType<typeof HTMLDivElement>>();

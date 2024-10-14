@@ -67,6 +67,7 @@ export default defineNuxtConfig({
         experimental: {
             openAPI: true,
         },
+        preset: "node-server",
     },
 
     vite: {

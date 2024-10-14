@@ -7,7 +7,7 @@ import {
     type SequenceElement,
     type SequencePage,
 } from "~/models/SequenceDiagramData";
-import { tokenize, TokenType, type Token } from "./lexer.plant";
+import { Token, tokenize, TokenType } from "./lexer.plant";
 
 export class PlantUMLParser {
     dev?: boolean;
@@ -152,6 +152,7 @@ export class PlantUMLParser {
                     this.actors.push({
                         name: value,
                         participant: current.is("Participant"),
+                        token: current,
                     });
                     this.consume();
                     break;
@@ -317,8 +318,14 @@ export class PlantUMLParser {
         const sender_actor = this.actors.find((a) => a.name === sender.value);
         const receiver_actor = this.actors.find((a) => a.name === receiver.value);
 
-        if (!sender_actor) this.actors.push({ name: sender.value, participant: true });
-        if (!receiver_actor) this.actors.push({ name: receiver.value, participant: true });
+        if (!sender_actor) {
+            const token = new Token(TokenType.Actor, sender.value, -1, "---NOT FOUND IN PROMPT---");
+            this.actors.push({ name: sender.value, participant: true, token });
+        }
+        if (!receiver_actor) {
+            const token = new Token(TokenType.Actor, sender.value, -1, "---NOT FOUND IN PROMPT");
+            this.actors.push({ name: receiver.value, participant: true, token });
+        }
 
         const isAsync = conn.value.includes("-->");
         const msg: Message = {
@@ -326,6 +333,7 @@ export class PlantUMLParser {
             receiver: receiver.value,
             content: content.value,
             type: isAsync ? "async" : "sync",
+            token: sender,
         };
 
         this.messages.push(msg);

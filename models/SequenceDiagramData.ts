@@ -1,5 +1,6 @@
 import * as c from "xml-js";
 import { convert } from "~/logic/sequence/converter";
+import type { Token } from "~/logic/sequence/lexer.plant";
 import { parse } from "~/logic/sequence/parser";
 
 export enum SequenceProcessErrror {
@@ -48,6 +49,7 @@ export type SequenceElement = Message | Block | Note | Activation;
 export interface Actor {
     name: string;
     participant?: boolean;
+    token: Token;
 }
 
 export interface Message {
@@ -56,6 +58,7 @@ export interface Message {
     receiver: string;
     content: string;
     cellid?: number;
+    token: Token;
 }
 
 export type Block = {

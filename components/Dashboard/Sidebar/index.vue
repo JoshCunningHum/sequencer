@@ -35,7 +35,7 @@ const showContextMenu = (event: MouseEvent, project: Project) =>
 
 <template>
     <div v-if="mounted" class="wrapper" :class="{ minimized: minimized_sidebar }">
-        <Fill class="pl-2 py-2 flex flex-col min-w-[225px]" ref="container">
+        <Fill class="px-2 py-2 flex flex-col min-w-[225px]" ref="container">
             <IconField class="mb-2">
                 <InputIcon class="pi pi-search" />
                 <InputText placeholder="Search projects..." class="!pl-9 w-full" v-model="search" />
