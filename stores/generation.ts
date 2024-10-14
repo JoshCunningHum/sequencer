@@ -59,31 +59,36 @@ export const useGenerationStore = defineStore("generation", () => {
 
   // Initialize on setup
   const init = (p: Project) => {
-    const [err] = safeTry(() => {
-      // Create new instances
+    const strict = strictMode.value;
+    const result: typeof prompts.value = {
+      class: "",
+      llm: "",
+      sequence: "",
+      usecase: "",
+    };
+
+    const [errclass] = safeTry(() => {
       const cd = new ClassDiagramData(p.class);
-      const ud = new UseCaseDiagramData(p.usecase);
-      const sd = new SequenceDiagramData();
-
       cd.toJSON();
-      ud.toJSON();
-
       cd.process();
-      ud.process();
-
-      const cp = cd.toPrompt();
-      const up = ud.toPrompt();
-      const llm = generate_sequence(cp, up, { strict: strictMode.value });
-
-      // Apply the new objects to refs
-      set(prompts, {
-        class: cd.toPrompt(),
-        usecase: ud.toPrompt(),
-        sequence: llm,
-        llm,
-      });
+      result.class = cd.toPrompt();
     });
-    if (err) console.error(err);
+
+    const [errusecase] = safeTry(() => {
+      const ud = new UseCaseDiagramData(p.usecase);
+      ud.toJSON();
+      ud.process();
+      result.usecase = ud.toPrompt();
+    });
+
+    if (errclass) console.error(`Error loading class`, errclass);
+    if (errusecase) console.error(`Error loading usecase`, errusecase);
+
+    const llm = generate_sequence(result.class, result.usecase, { strict });
+    result.llm = llm;
+    result.sequence = llm;
+
+    set(prompts, result);
   };
 
   onMounted(() => project.value && init(project.value));
