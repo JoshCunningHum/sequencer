@@ -16,5 +16,11 @@
     "tailwindCSS.experimental.configFile": "tailwind.config.ts",
     "css.customData": [".vscode/tailwind.json"],
     "scss.lint.unknownAtRules": "ignore",
-    "css.lint.unknownAtRules": "ignore"
+    "css.lint.unknownAtRules": "ignore",
+    "editor.codeActionsOnSave": {
+        "source.addMissingImports.ts": "always"
+    },
+    "typescript.tsserver.experimental.useVsCodeWatcher": false,
+    "editor.detectIndentation": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

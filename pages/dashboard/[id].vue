@@ -16,24 +16,25 @@ const { xml: prioxml } = storeToRefs(drawIOStore);
 const uiStore = useUiStore();
 const { diagram } = storeToRefs(uiStore);
 
-const generationStore = useGenerationStore();
-const { project } = storeToRefs(generationStore);
-const update = generationStore.update;
+const { project, update } = useProject();
 
 const xml = computed(() => {
-    if (diagram.value === "sequence") return prioxml.value || project.value?.sequence || "";
+    if (diagram.value === "sequence")
+        return prioxml.value || project.value?.sequence || "";
     return project.value?.[diagram.value] || "";
 });
 
 // Handle savings
-const { isLoading: isSaving, execute: save } = useAsyncState(update, false, { immediate: false });
+const { isLoading: isSaving, execute: save } = useAsyncState(update, false, {
+    immediate: false,
+});
 const onSave = (data: string) => {
     const p = project.value;
     const tab = diagram.value;
     if (!p) return;
 
     p[tab] = data;
-    save();
+    save(0, p);
 };
 </script>
 
@@ -42,7 +43,11 @@ const onSave = (data: string) => {
         <DashboardToolbar />
         <Fill :overflow-scroll-y="false">
             <KeepAlive>
-                <DrawIOEmbed :saving="isSaving" :model-value="xml" @save="onSave" />
+                <DrawIOEmbed
+                    :saving="isSaving"
+                    :model-value="xml"
+                    @save="onSave"
+                />
             </KeepAlive>
             <SequenceSection />
         </Fill>

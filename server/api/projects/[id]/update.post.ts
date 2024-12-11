@@ -1,4 +1,6 @@
+import { eq } from "drizzle-orm";
 import * as yup from "yup";
+import { useDrizzle, tables } from "~/server/utils/drizzle";
 import { safeAwait } from "~/utils/safeTry";
 
 const schema = yup.object({

@@ -9,7 +9,7 @@ export const useUserStore = defineStore("user", () => {
             immediate: false,
         }),
         undefined,
-        { shallow: false }
+        { shallow: false },
     );
 
     return {
@@ -17,7 +17,3 @@ export const useUserStore = defineStore("user", () => {
         sync,
     };
 });
-
-if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot));
-}

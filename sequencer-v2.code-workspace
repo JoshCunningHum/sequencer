@@ -16,5 +16,6 @@
         "nuxtr.openItemsAfterCreation": true,
         "css.lint.unknownAtRules": "ignore",
         "scss.lint.unknownAtRules": "ignore",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
     },
 }

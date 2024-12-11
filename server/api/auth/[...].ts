@@ -5,6 +5,7 @@ import GitHubProvider from "@auth/core/providers/github";
 import { AuthConfig, User } from "@auth/core/types";
 import * as yup from "yup";
 import { loginSchema } from "~/schemas/auth";
+import { eq, tables, useDrizzle } from "~/server/utils/drizzle";
 
 const runtime_config = useRuntimeConfig();
 

@@ -1,23 +1,27 @@
 <script setup lang="ts">
+import { get } from "@vueuse/core";
 import TestBtn from "./TestBtn.vue";
 
 //#region Opening
 const uiStore = useUiStore();
 const { diagram, sidebar_tab: side_tab } = storeToRefs(uiStore);
 const open = computed(
-    () => !!side_tab.value && (diagram.value === "sequence" || side_tab.value !== "generate")
+    () =>
+        !!side_tab.value &&
+        (diagram.value === "sequence" || side_tab.value !== "generate"),
 );
 
-const generationStore = useGenerationStore();
-const { is_generating } = storeToRefs(generationStore);
+const generateStore = useGenerateStore();
+const { step } = storeToRefs(generateStore);
+const isIdle = computed(() => get(step) === GenerationStep.Idle);
 </script>
 
 <template>
     <Transition name="expand">
-        <div v-if="open" class="py-2 px-4">
+        <div v-if="open" class="px-4 py-2">
             <template v-if="side_tab === 'generate'">
-                <SequenceResult v-if="is_generating" />
-                <SequenceConfig v-else />
+                <SequenceConfig v-if="isIdle" />
+                <SequenceResult v-else />
             </template>
             <SequenceInfo v-else-if="side_tab === 'info'" />
         </div>

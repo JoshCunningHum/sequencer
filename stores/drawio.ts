@@ -5,7 +5,3 @@ export const useDrawioStore = defineStore("drawio", () => {
 
     return { xml };
 });
-
-if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useDrawioStore, import.meta.hot));
-}

@@ -1,5 +1,6 @@
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { registerSchema } from "~/schemas/auth";
+import { useDrizzle, tables } from "~/server/utils/drizzle";
 
 export default defineEventHandler(async (event) => {
     const body = await readValidatedBody(event, (body) => registerSchema.validateSync(body));

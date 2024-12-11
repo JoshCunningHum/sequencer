@@ -20,7 +20,7 @@ const {
     <Fill
         flex-col
         class="items-center justify-center text-secondary-emph text-sm flex flex-col gap-2 dmsans"
-        :class="!selectable && 'select-none'"
+        :class="{ 'select-none': selectable }"
     >
         <i :class="`${icon} ${iconClass} text-4xl`" v-if="!noIcon" />
         <slot>

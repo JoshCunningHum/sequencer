@@ -15,7 +15,3 @@ export const useUiStore = defineStore("ui", () => {
         sidebar_tab,
     };
 });
-
-if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useUiStore, import.meta.hot));
-}

@@ -19,7 +19,11 @@ const withinArrayBounds = (index: number, array: any[]) => {
     return Math.max(0, Math.min(index, array.length - 1));
 };
 
-export const validateSequence = (data: SequencePage[], basis: ClassPage[], prompt: string) => {
+export const validateSequence = (
+    data: SequencePage[],
+    basis: ClassPage[],
+    prompt: string,
+) => {
     const classes = basis.flatMap((c) => c.data);
     const lines = prompt.split("\n");
 
@@ -42,7 +46,8 @@ export const validateSequence = (data: SequencePage[], basis: ClassPage[], promp
         actors.forEach(({ name: actor, token }) => {
             const line_number = token.line;
             const does_exist = classes.some((c) => c.name === actor);
-            const code_reference = line_number !== -1 ? codeBlock(line_number) : token.lineStr;
+            const code_reference =
+                line_number !== -1 ? codeBlock(line_number) : token.lineStr;
 
             if (!does_exist) {
                 const description = `Actor: "${actor}" not found in class diagram`;
@@ -63,7 +68,9 @@ export const validateSequence = (data: SequencePage[], basis: ClassPage[], promp
             const code_reference = codeBlock(line_number);
 
             // Check if method is existing
-            const does_exist = classes.some((c) => c.properties.includes(method));
+            const does_exist = classes.some((c) =>
+                c.properties.includes(method),
+            );
 
             if (!does_exist) {
                 const description = `Method: "${method}" not found in class diagram`;
