@@ -1,0 +1,135 @@
+<script lang="ts" setup>
+import { set } from "@vueuse/core";
+
+// Props and Emits
+
+const model = defineModel<string>({
+    default: "",
+});
+
+const {
+    noAutosave = false,
+    saving = false,
+    viewOnly = false,
+} = defineProps<{
+    noAutosave?: boolean;
+    saving?: boolean;
+    viewOnly?: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: "loaded"): void;
+    (e: "save", data: string): void;
+}>();
+
+// DrawIO Source Config
+
+const params: Record<string, number | string> = {
+    embed: 1,
+    spin: 1,
+    ui: "min",
+    dark: 1,
+    proto: "json",
+    format: "xml",
+    noExitBtn: 1,
+};
+
+if (viewOnly) {
+    params.noSaveBtn = 1;
+    params.saveAndExit = 0;
+}
+
+const embedlink = "https://embed.diagrams.net";
+
+const params_processed = computed(() =>
+    Object.entries(params)
+        .map(([key, val]) => `${key}=${val}`)
+        .join("&"),
+);
+
+// Functions
+const setXML = (xml: string) => {
+    post({ action: "load", autosave: !noAutosave, xml });
+};
+
+// Loading
+const loaded = ref(false);
+
+// Iframe
+
+const frame = ref<InstanceType<typeof HTMLIFrameElement>>();
+
+const post = (msg: any) => {
+    if (!frame.value) return;
+    frame.value.contentWindow?.postMessage(JSON.stringify(msg), "*");
+};
+
+interface DrawIOMsg {
+    event: "init" | "export" | "autosave" | "save" | "exit" | "load";
+    xml?: string;
+}
+
+const componentid = useId();
+
+const receive = (evt: MessageEvent, fromid: string) => {
+    if (evt.origin !== embedlink || fromid !== componentid) return;
+
+    const msg = JSON.parse(evt.data) as DrawIOMsg;
+
+    switch (msg.event) {
+        case "init":
+            setXML(model.value);
+            set(loaded, false);
+
+            setTimeout(() => set(loaded, true), 4000);
+            break;
+        case "save":
+            if (viewOnly) return;
+            console.log(`%cSaving...`, "color: orange");
+            model.value = msg.xml || "";
+            emit("save", msg.xml || "");
+            break;
+        case "load":
+            set(loaded, true);
+            emit("loaded");
+            break;
+    }
+};
+
+const messagehandler = (e: MessageEvent) => {
+    receive(e, componentid || "");
+};
+
+// Iframe event binding
+onMounted(() => window.addEventListener("message", messagehandler));
+onUnmounted(() => window.removeEventListener("message", messagehandler));
+watch(model, setXML);
+</script>
+
+<template>
+    <Fill class="relative my-1 overflow-hidden rounded-md">
+        <iframe
+            :allowtransparency="true"
+            ref="frame"
+            class="h-full w-full bg-surface-900"
+            style="background: black"
+            :src="`${embedlink}/?${params_processed}`"
+            :frameborder="0"
+        />
+
+        <div
+            v-if="!loaded"
+            class="absolute flex h-full w-full items-center justify-center bg-surface-900"
+        >
+            <Loading data="Loading DrawIO UI" />
+        </div>
+        <div
+            v-else-if="saving"
+            class="absolute flex h-full w-full items-center justify-center bg-surface-900 opacity-60"
+        >
+            <Loading data="Saving Data" />
+        </div>
+    </Fill>
+</template>
+
+<style lang="scss" scoped></style>

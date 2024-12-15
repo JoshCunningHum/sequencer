@@ -1,0 +1,19 @@
+{
+    "nuxtr.openItemsAfterCreation": true,
+    "typescript.tsserver.experimental.useVsCodeWatcher": false,
+    "editor.codeActionsOnSave": {
+        "source.addMissingImports.ts": "always"
+    },
+    "scss.lint.unknownAtRules": "ignore",
+    "css.lint.unknownAtRules": "ignore",
+    "css.customData": [".vscode/tailwind.json"],
+    "tailwindCSS.classAttributes": [
+        "class",
+        "className",
+        "ngClass",
+        "ui",
+        "pt"
+    ],
+    "tailwindCSS.experimental.configFile": "./layers/core/tailwind.config.ts",
+    "cursor.general.disableHttp2": false
+}
