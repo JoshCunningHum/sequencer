@@ -24,12 +24,8 @@ export const useValidation = (params: {
     const validate = (result: GeneratedResult) => {
         if (!cd.value) return;
         const { pages, response, xml } = result;
-        console.log(pages);
 
         const conflicts = validateSequence(pages, cd.value.pages, response);
-        console.log(conflicts);
-
-        console.log(response);
 
         // Choose the least-error output
         if (warnings.value.length > conflicts.length || !optimal.value) {
@@ -46,8 +42,6 @@ export const useValidation = (params: {
     watchArray(
         sequences,
         (curr, _, added) => {
-            console.log(curr, added);
-
             // When the sequences result is erased. Also erase the warnings array
             if (!curr.length) reset();
             else added.forEach(validate);

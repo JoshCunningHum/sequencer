@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { get, set } from "@vueuse/core";
-import { warnings_tst } from "./warnings.test";
-import type { ValidationError } from "~/logic/sequence/validator.plant";
 
 const generateStore = useGenerateStore();
 
@@ -49,6 +47,7 @@ const removeAccepted = (id: string) => {
 <template>
     <div class="flex h-full min-w-96 flex-col gap-2">
         <SequenceResultStatus
+            @cancel="generateStore.cancel"
             :progress
             :description="GenerationStatus[gen_status]"
             v-if="step === GenerationStep.Generating"
@@ -81,9 +80,18 @@ const removeAccepted = (id: string) => {
                 @click="open_conflict_details = true"
             />
 
-            <Button label="Accept Output" fluid icon="pi pi-check-circle" />
+            <Button
+                label="Accept Output"
+                fluid
+                icon="pi pi-check-circle"
+                @click="generateStore.save"
+            />
         </div>
+        <Fill center v-if="step === GenerationStep.Saving">
+            <Loading data="Saving" />
+        </Fill>
 
+        <!-- Modal -->
         <SequenceResultValidation
             v-model:open="show_conflict_details"
             :accepted="warningsToKeep"

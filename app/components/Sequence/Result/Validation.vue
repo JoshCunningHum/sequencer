@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { get, set } from "@vueuse/core";
 import type { ValidationError } from "~/logic/sequence/validator.plant";
-import { response_tst, warnings_tst } from "./warnings.test";
-import { PlantUMLParser } from "~/logic/sequence/parser.plant";
-import { PlantUMLConverter } from "~/logic/sequence/converter.plant";
 
 const open = defineModel<boolean>("open", { default: false });
 const props = defineProps<{
@@ -66,14 +63,6 @@ const allWarningToggle = computed({
             v ? emit("accept", w.id) : emit("unaccept", w.id),
         ),
 });
-
-// TODO: Test
-const drawioStore = useDrawioStore();
-const responseToXML = (txt: string) => {
-    const data = PlantUMLParser.Parse(txt);
-    return PlantUMLConverter.Convert({ data });
-};
-watchImmediate(open, () => (drawioStore.xml = responseToXML(response_tst)));
 </script>
 
 <template>

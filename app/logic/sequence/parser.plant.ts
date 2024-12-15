@@ -58,10 +58,10 @@ export class PlantUMLParser {
     }
 
     consume<T extends number | undefined = undefined>(
-        n?: T
+        n?: T,
     ): T extends number ? Token[] : Token | undefined {
         this.log(
-            `consume: ${n || 1} item${n ? "s" : ""} = [${this.range(n || 1).map((v) => v.value)}]`
+            `consume: ${n || 1} item${n ? "s" : ""} = [${this.range(n || 1).map((v) => v.value)}]`,
         );
 
         this.index += n || 1;
@@ -111,16 +111,24 @@ export class PlantUMLParser {
             .fill(0)
             .map(
                 (_, i) =>
-                    `${String(line_number - i).padStart(3, " ")}| ${this.get_line(line_number - i)}`
+                    `${String(line_number - i).padStart(3, " ")}| ${this.get_line(line_number - i)}`,
             )
             .reverse()
             .join("\n");
 
-        return new Error(`Error at line ${line_number}: ${msg}\n${code_section}`);
+        return new Error(
+            `Error at line ${line_number}: ${msg}\n${code_section}`,
+        );
     }
 
     throw(error: Error) {
-        console.log(`Parsing details: `, this.tokens, this.prevMsg, this.actors, this.activations);
+        console.log(
+            `Parsing details: `,
+            this.tokens,
+            this.prevMsg,
+            this.actors,
+            this.activations,
+        );
         throw error;
     }
 
@@ -163,8 +171,15 @@ export class PlantUMLParser {
                     break;
                 default:
                     const stmt = this.parseStatement();
-                    if (!!stmt && isSequenceBlock(stmt) && stmt.type === "block") {
-                        this.warn(current, `Continuation block without parent block`);
+                    if (
+                        !!stmt &&
+                        isSequenceBlock(stmt) &&
+                        stmt.type === "block"
+                    ) {
+                        this.warn(
+                            current,
+                            `Continuation block without parent block`,
+                        );
                         break; // Do not add items of 'else' blocks
                     }
                     this.add(stmt);
@@ -194,7 +209,10 @@ export class PlantUMLParser {
                 break;
             case "Activate":
             case "Deactivate":
-                const act = type === "Activate" ? this.parseActivation() : this.endActivation();
+                const act =
+                    type === "Activate"
+                        ? this.parseActivation()
+                        : this.endActivation();
                 if (act) return act;
                 break;
             case "BlockStart":
@@ -311,20 +329,37 @@ export class PlantUMLParser {
         const sender = this.consume()!;
         const [conn, receiver, content] = this.consume(3);
 
-        const isMessage = conn?.is("Connect") && receiver?.is("Var") && content?.is("Var");
+        const isMessage =
+            conn?.is("Connect") && receiver?.is("Var") && content?.is("Var");
         if (!isMessage) return undefined;
 
         // Check for un-documented actors
         const sender_actor = this.actors.find((a) => a.name === sender.value);
-        const receiver_actor = this.actors.find((a) => a.name === receiver.value);
+        const receiver_actor = this.actors.find(
+            (a) => a.name === receiver.value,
+        );
 
         if (!sender_actor) {
-            const token = new Token(TokenType.Actor, sender.value, -1, "---NOT FOUND IN PROMPT---");
+            const token = new Token(
+                TokenType.Actor,
+                sender.value,
+                -1,
+                "---NOT FOUND IN PROMPT---",
+            );
             this.actors.push({ name: sender.value, participant: true, token });
         }
         if (!receiver_actor) {
-            const token = new Token(TokenType.Actor, sender.value, -1, "---NOT FOUND IN PROMPT");
-            this.actors.push({ name: receiver.value, participant: true, token });
+            const token = new Token(
+                TokenType.Actor,
+                sender.value,
+                -1,
+                "---NOT FOUND IN PROMPT",
+            );
+            this.actors.push({
+                name: receiver.value,
+                participant: true,
+                token,
+            });
         }
 
         const isAsync = conn.value.includes("-->");
@@ -349,10 +384,6 @@ export class PlantUMLParser {
     parseActivation() {
         const current = this.consume()!;
         const actor = current.value;
-        const lastmsg = this.prevMsg;
-
-        if (!lastmsg)
-            this.throw(this.e(current, `Activation of actor[${actor}] but no messages yet`));
 
         const activation: Activation = { actor, type: "start" };
 
@@ -364,18 +395,15 @@ export class PlantUMLParser {
         // This does not mutate the elements, just adds the ending element
         const current = this.consume()!;
         const actor = current.value;
-        const lastmsg = this.prevMsg;
 
         const activation = this.activations.get(actor);
         if (!activation) {
-            this.warn(current, `Deactivation of actor[${actor}] without activating it`);
+            this.warn(
+                current,
+                `Deactivation of actor[${actor}] without activating it`,
+            );
             return;
         }
-
-        if (!lastmsg)
-            this.throw(
-                this.e(current, `Deactivation of actor[${actor}] without reference message`)
-            );
 
         // this.activations.delete(actor);
         const end_activation: Activation = { actor, type: "end" };

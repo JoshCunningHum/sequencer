@@ -78,7 +78,9 @@ export class PlantUMLConverter {
     actors: ActorHelper = new ActorHelper([], 0);
     block: BlockHelper;
 
-    new_y(type: "message" | "block" | "block-end" | "self-message" = "message"): number {
+    new_y(
+        type: "message" | "block" | "block-end" | "self-message" = "message",
+    ): number {
         const lasty = this.y;
 
         switch (type) {
@@ -121,7 +123,7 @@ export class PlantUMLConverter {
             {
                 spaces: 2,
                 compact: false,
-            }
+            },
         );
     }
 
@@ -153,8 +155,9 @@ export class PlantUMLConverter {
         const { diag, elements } = this.createBoilerPlate();
 
         const actor_gap = page.messages.reduce(
-            (acc, msg) => Math.max(getTextDimensions(msg.content, 12).width, acc),
-            0
+            (acc, msg) =>
+                Math.max(getTextDimensions(msg.content, 12).width, acc),
+            0,
         );
 
         this.actors = new ActorHelper(page.actors, actor_gap);
@@ -207,8 +210,10 @@ export class PlantUMLConverter {
     }
 
     //#region Message
+    hasMessage = false;
     placeMessage(item: Message) {
-        const [startX, endX] = this.actors.getBounds(item.sender, item.receiver) || [];
+        const [startX, endX] =
+            this.actors.getBounds(item.sender, item.receiver) || [];
 
         if (!startX || !endX) {
             this.warn(`Creating a message with coords: (${startX}, ${endX})`);
@@ -246,11 +251,16 @@ export class PlantUMLConverter {
 
             this.add(msg);
         }
+
+        this.hasMessage = true;
     }
 
     //#region Activation
     placeActivation({ actor, type }: Activation) {
-        const y = this.y - (HEIGHT_MESSAGE + ITEMS_GAP);
+        const y =
+            this.y -
+            (HEIGHT_MESSAGE + ITEMS_GAP) +
+            (this.hasMessage ? HEIGHT_MESSAGE : 0);
         const actor_id = this.actors.id(actor);
         const bounds = this.actors.coord(actor);
 
@@ -377,10 +387,13 @@ export class PlantUMLConverter {
     }
 
     static uuid(length: number = 8): string {
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const characters =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
         for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * characters.length));
+            result += characters.charAt(
+                Math.floor(Math.random() * characters.length),
+            );
         }
         return result;
     }
@@ -389,7 +402,7 @@ export class PlantUMLConverter {
     depth_first(
         data: SequenceElement[],
         cb: (element: SequenceElement, index: number, depth: number) => void,
-        direction: "ltr" | "rtl" = "ltr"
+        direction: "ltr" | "rtl" = "ltr",
     ) {
         const isL2R = direction === "ltr";
 
@@ -406,9 +419,12 @@ export class PlantUMLConverter {
             depthrecord[depth]!--;
 
             if ("elements" in item) {
-                const elements = isL2R ? item.elements.slice(0).reverse() : item.elements;
+                const elements = isL2R
+                    ? item.elements.slice(0).reverse()
+                    : item.elements;
                 stack.push(...elements);
-                depthrecord[depth + 1] = (depthrecord[depth + 1] || 0) + elements.length;
+                depthrecord[depth + 1] =
+                    (depthrecord[depth + 1] || 0) + elements.length;
             }
 
             cb(item, index++, depth);

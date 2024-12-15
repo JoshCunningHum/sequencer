@@ -1,6 +1,7 @@
 import { GenerationStatus } from "@/composables/generation";
 import { get, set } from "@vueuse/core";
 import { defineStore } from "pinia";
+import { PlantUMLConverter } from "~/logic/sequence/converter.plant";
 import type { ValidationError } from "~/logic/sequence/validator.plant";
 import type { SequencePage } from "~/models/SequenceDiagramData";
 
@@ -17,11 +18,12 @@ export interface GeneratedResult {
     xml: string;
 }
 
-const MAX_SAMPLE = 1;
+const MAX_SAMPLE = 5;
 
 export const useGenerateStore = defineStore("generate", () => {
     const { project } = useProject();
     const projectStore = useProjectsStore();
+    const drawioStore = useDrawioStore();
 
     const strictMode = ref(true);
 
@@ -61,10 +63,16 @@ export const useGenerateStore = defineStore("generate", () => {
         // Add it on the successes record
         results.value.push({ pages, response, xml });
         // When strictmode is disabled. Show apply changes button
-        if (!strictMode.value) set(step, GenerationStep.Validating);
+        if (!strictMode.value) nextTick().then(save);
         // Else, re-genearate until max sample size is reached
         else if (results.value.length < MAX_SAMPLE) gen_retry();
-        else set(step, GenerationStep.Validating);
+        else {
+            set(step, GenerationStep.Validating);
+            // set optimal xml to drawio preview
+            nextTick().then(() => {
+                drawioStore.xml = resolved_xml.value;
+            });
+        }
     });
 
     const generate = () => {
@@ -79,27 +87,42 @@ export const useGenerateStore = defineStore("generate", () => {
         sequences: results,
         project,
     });
-    const accepted_warnings = useArrayFilter(warnings, (w) =>
-        get(warningsToKeep).includes(w.id),
+    const removed_conflicts = useArrayFilter(
+        warnings,
+        (w) => !get(warningsToKeep).includes(w.id),
     );
-    const { resolved } = useReconciler({
+    const { resolved, xml: resolved_xml } = useReconciler({
         data: optimal,
-        accepted: accepted_warnings,
+        filter: removed_conflicts,
     });
+    watch(resolved_xml, (v) => strictMode.value && (drawioStore.xml = v));
 
     // Handle Saving
     const save = () => {
         if (!isDefined(project) || !isDefined(optimal)) return;
+        const sequence = strictMode.value
+            ? resolved_xml.value
+            : optimal.value.xml;
+
+        console.log(optimal.value.xml);
+
         set(step, GenerationStep.Saving);
         projectStore
-            .update({ ...project.value, sequence: optimal.value.xml })
-            .then(cancel);
+            .update({
+                ...project.value,
+                sequence,
+            })
+            .then(cancel)
+            .then(() => {
+                drawioStore.xml = undefined;
+            });
     };
 
     // Cancel/Reset all the progress
     const cancel = () => {
         warningsToKeep.value.splice(0);
         results.value.splice(0);
+        set(warningsToKeep, []);
         set(error, undefined);
         set(step, GenerationStep.Idle);
     };
@@ -115,5 +138,6 @@ export const useGenerateStore = defineStore("generate", () => {
         warningsToKeep,
         generate,
         cancel,
+        save,
     };
 });
