@@ -1,0 +1,21 @@
+{
+    "folders": [
+        {
+            "path": ".",
+        },
+    ],
+    "settings": {
+        "files.associations": {
+            "*.css": "tailwindcss",
+        },
+        "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui"],
+        "nuxtr.intellisense.nuxtrc": true,
+        "nuxtr.intellisense.vueFiles": true,
+        "nuxtr.intellisense.nuxtignore": true,
+        "tailwindCSS.experimental.configFile": "tailwind.config.ts",
+        "nuxtr.openItemsAfterCreation": true,
+        "css.lint.unknownAtRules": "ignore",
+        "scss.lint.unknownAtRules": "ignore",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+}
