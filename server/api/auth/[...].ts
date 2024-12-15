@@ -4,11 +4,12 @@ import CredentialsProvider from "@auth/core/providers/credentials";
 import GitHubProvider from "@auth/core/providers/github";
 import { AuthConfig, User } from "@auth/core/types";
 import * as yup from "yup";
-import { loginSchema } from "~/schemas/auth";
+import { login_schema } from "~/schemas/auth";
+import { eq, tables, useDrizzle } from "@@/server/utils/drizzle";
 
 const runtime_config = useRuntimeConfig();
 
-type SignInPayload = yup.InferType<typeof loginSchema> & {
+type SignInPayload = yup.InferType<typeof login_schema> & {
     csrfToken: string;
     callbackUrl: string;
     json: boolean;
@@ -38,7 +39,11 @@ export const authOptions: AuthConfig = {
 
                 if (!match || match.password !== password) return null;
 
-                return { ...match, name: match.username, id: String(match.id) } as User;
+                return {
+                    ...match,
+                    name: match.username,
+                    id: String(match.id),
+                } as User;
             },
         }),
     ],

@@ -1,10 +1,14 @@
-import { count } from "drizzle-orm";
-import { registerSchema } from "~/schemas/auth";
+import { count, eq } from "drizzle-orm";
+import { register_schema } from "~/schemas/auth";
+import { useDrizzle, tables } from "@@/server/utils/drizzle";
 
 export default defineEventHandler(async (event) => {
-    const body = await readValidatedBody(event, (body) => registerSchema.validateSync(body));
+    const body = await readValidatedBody(event, (body) =>
+        register_schema.validateSync(body),
+    );
 
-    if (!body) throw createError({ statusCode: 400, message: "Invalid Payload" });
+    if (!body)
+        throw createError({ statusCode: 400, message: "Invalid Payload" });
 
     const { email, password, username } = body;
     // Check first if said user exists
@@ -20,7 +24,9 @@ export default defineEventHandler(async (event) => {
             statusMessage: "Email already used",
         });
 
-    await useDrizzle().insert(tables.users).values({ email, password, username });
+    await useDrizzle()
+        .insert(tables.users)
+        .values({ email, password, username });
 
     return true;
 });

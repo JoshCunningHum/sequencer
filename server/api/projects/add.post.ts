@@ -1,5 +1,6 @@
 import * as yup from "yup";
-import { safeAwait, safeTry } from "~/utils/safeTry";
+import { useDrizzle, tables } from "@@/server/utils/drizzle";
+import { safeAwait } from "~~/layers/core/utils/safeTry";
 
 const schema = yup.object({
     id: yup.number().required(),
@@ -10,7 +11,7 @@ const schema = yup.object({
 
 export default defineEventHandler(async (event) => {
     const [err, body] = await safeAwait(
-        readValidatedBody(event, (body) => schema.validateSync(body))
+        readValidatedBody(event, (body) => schema.validateSync(body)),
     );
 
     if (err) return "Invalid Payload";

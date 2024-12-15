@@ -1,23 +1,32 @@
-# Nuxt 3 Minimal Starter
+# Hello Edge
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A minimal [Nuxt](https://nuxt.com) starter deployed on the Edge using [NuxtHub](https://hub.nuxt.com).
+
+https://hello.nuxt.dev
+
+<a href="https://hello.nuxt.dev">
+<img src="https://github.com/nuxt-hub/hello-edge/assets/904724/99d1bd54-ef7e-4ac9-83ad-0a290f85edcf" alt="Hello World template for NuxtHub" />
+</a>
+
+## Features
+
+- Server-Side rendering on Cloudflare Workers
+- ESLint setup
+- Ready to add a database, blob and KV storage
+- One click deploy on 275+ locations for free
 
 ## Setup
 
-Make sure to install the dependencies:
+Make sure to install the dependencies with [pnpm](https://pnpm.io/installation#using-corepack):
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
+```
 
-# yarn
-yarn install
+You can update the main text displayed by creating a `.env`:
 
-# bun
-bun install
+```bash
+NUXT_PUBLIC_HELLO_TEXT="Hello my world!"
 ```
 
 ## Development Server
@@ -25,17 +34,7 @@ bun install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+pnpm dev
 ```
 
 ## Production
@@ -43,33 +42,17 @@ bun run dev
 Build the application for production:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+pnpm build
 ```
 
-Locally preview production build:
+## Deploy
+
+Deploy the application on the Edge with [NuxtHub](https://hub.nuxt.com) on your Cloudflare account:
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+npx nuxthub deploy
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Then checkout your server logs, analaytics and more in the [NuxtHub Admin](https://admin.hub.nuxt.com).
+
+You can also deploy using [Cloudflare Pages CI](https://hub.nuxt.com/docs/getting-started/deploy#cloudflare-pages-ci).

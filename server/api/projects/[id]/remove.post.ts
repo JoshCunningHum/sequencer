@@ -1,5 +1,7 @@
+import { and, eq } from "drizzle-orm";
 import * as yup from "yup";
-import { safeAwait } from "~/utils/safeTry";
+import { useDrizzle, tables } from "@@/server/utils/drizzle";
+import { safeAwait } from "~~/layers/core/utils/safeTry";
 
 const schema = yup.object({
     user_id: yup.number().required(),
@@ -7,7 +9,7 @@ const schema = yup.object({
 
 export default defineEventHandler(async (event) => {
     const [err, body] = await safeAwait(
-        readValidatedBody(event, (body) => schema.validateSync(body))
+        readValidatedBody(event, (body) => schema.validateSync(body)),
     );
     const project_id = Number(getRouterParam(event, "id"));
     if (err || !body) return false;
@@ -15,7 +17,12 @@ export default defineEventHandler(async (event) => {
     // Also compare creator to (mostly)avoid csrf attack on project deletion (waw naman)
     const deleted = await useDrizzle()
         .delete(tables.projects)
-        .where(and(eq(tables.projects.id, project_id), eq(tables.projects.by, body.user_id)))
+        .where(
+            and(
+                eq(tables.projects.id, project_id),
+                eq(tables.projects.by, body.user_id),
+            ),
+        )
         .returning();
 
     // Only return true when there is an actual project deleted

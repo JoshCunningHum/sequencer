@@ -1,5 +1,7 @@
+import { and, eq } from "drizzle-orm";
 import * as yup from "yup";
-import { safeAwait } from "~/utils/safeTry";
+import { useDrizzle, tables } from "@@/server/utils/drizzle";
+import { safeAwait } from "~~/layers/core/utils/safeTry";
 
 const schema = yup.object({
     projectID: yup.number().required(),
@@ -8,7 +10,7 @@ const schema = yup.object({
 
 export default defineEventHandler(async (event): Promise<boolean> => {
     const [err, body] = await safeAwait(
-        readValidatedBody(event, (body) => schema.validateSync(body))
+        readValidatedBody(event, (body) => schema.validateSync(body)),
     );
 
     if (err) return false;
@@ -17,7 +19,12 @@ export default defineEventHandler(async (event): Promise<boolean> => {
     const [match] = await useDrizzle()
         .select()
         .from(tables.projects)
-        .where(and(eq(tables.projects.by, userID), eq(tables.projects.id, projectID)));
+        .where(
+            and(
+                eq(tables.projects.by, userID),
+                eq(tables.projects.id, projectID),
+            ),
+        );
 
     return !!match;
 });

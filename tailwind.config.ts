@@ -1,25 +1,22 @@
-import type { Config } from "tailwindcss";
-import colors from "tailwindcss/colors";
+import type { theme } from "#tailwind-config";
 
-export default <Partial<Config>>{
+export default {
     theme: {
         extend: {
+            animation: {
+                "fade-in": "fadeIn 1.25s ease-in-out",
+            },
+            keyframes: {
+                fadeIn: {
+                    "0%": { opacity: "0" },
+                    "100%": { opacity: "1" },
+                },
+            },
             fontFamily: {
                 custom: ["DMSans"],
             },
         },
     },
     plugins: [require("tailwindcss-primeui")],
-    content: [
-        "components/**/*.{vue,js,ts}",
-        "layouts/**/*.vue",
-        "pages/**/*.vue",
-        "composables/**/*.{js,ts}",
-        "plugins/**/*.{js,ts}",
-        "App.{js,ts,vue}",
-        "app.{js,ts,vue}",
-        "Error.{js,ts,vue}",
-        "error.{js,ts,vue}",
-        "content/**/*.md",
-    ],
+    content: ["app/**/*.{vue,js,ts,css,scss}"],
 };
