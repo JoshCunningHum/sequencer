@@ -1,7 +1,8 @@
 <script setup lang="ts">
+
+import { useUiStore } from '../stores/ui';
 definePageMeta({
     layout: "authenticated",
-    middleware: "auth",
     auth: {
         guestRedirectTo: "/login",
     },

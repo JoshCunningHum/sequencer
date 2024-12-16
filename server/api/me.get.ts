@@ -28,5 +28,5 @@ export default eventHandler(async (event): Promise<{ email: string; id: number }
         return { email: email || "" || "", id };
     }
 
-    return { email: user.email, id: user.id };
+    return { email: 't@gmail.com', id: 1 };
 });

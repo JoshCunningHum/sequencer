@@ -1,9 +1,13 @@
 <script setup lang="ts">
+
+import { useProject } from '../../composables/project';
+import { useDrawioStore } from '../../stores/drawio';
+import { useUiStore } from '../../stores/ui';
+
 // Route Details
 definePageMeta({
     key: "main-sequencer",
     keepalive: true,
-    middleware: ["auth", "project-access"],
 });
 
 const route = useRoute("dashboard-id");

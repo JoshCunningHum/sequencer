@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import type { SidebarItem } from "~~/layers/core/components/CoreSidebar/types";
 import stringInitials from "~~/layers/core/utils/stringInitials";
+import { field } from "../../../layers/core/composables/field";
+import { useUserStore } from "../../stores/user";
 
 //#region Sidenav Configuration
 
-const { user } = useAuth();
-
+const user = ref({
+    image: undefined,
+    name: 'Test User',
+    id: 1,
+    email: 't@gmail.com'
+})
 const image = field(user, "image");
 const name = field(user, "name");
 
