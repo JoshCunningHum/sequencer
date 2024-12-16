@@ -3,13 +3,15 @@ import type { SidebarItem } from "~~/layers/core/components/CoreSidebar/types";
 import stringInitials from "~~/layers/core/utils/stringInitials";
 import { field } from "../../../layers/core/composables/field";
 import { useUserStore } from "../../stores/user";
+import { computed, onMounted } from "vue";
+import { ref } from "yup";
 
 //#region Sidenav Configuration
 
 const user = ref({
     image: undefined,
     name: 'Test User',
-    id: 1,
+    id: 2,
     email: 't@gmail.com'
 })
 const image = field(user, "image");
