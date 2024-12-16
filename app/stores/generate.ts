@@ -4,6 +4,12 @@ import { defineStore } from "pinia";
 import { PlantUMLConverter } from "~/logic/sequence/converter.plant";
 import type { ValidationError } from "~/logic/sequence/validator.plant";
 import type { SequencePage } from "~/models/SequenceDiagramData";
+import { useGeneration } from "../composables/generation";
+import { useProject } from "../composables/project";
+import { useReconciler } from "../composables/reconciler";
+import { useValidation } from "../composables/validation";
+import { useDrawioStore } from "./drawio";
+import { useProjectsStore } from "./projects";
 
 export enum GenerationStep {
     Idle,
@@ -122,6 +128,7 @@ export const useGenerateStore = defineStore("generate", () => {
     const cancel = () => {
         warningsToKeep.value.splice(0);
         results.value.splice(0);
+        drawioStore.xml = undefined;
         set(warningsToKeep, []);
         set(error, undefined);
         set(step, GenerationStep.Idle);

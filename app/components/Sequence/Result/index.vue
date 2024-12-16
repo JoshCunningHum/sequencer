@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get, set } from "@vueuse/core";
+import { useGenerateStore, GenerationStep } from "../../../stores/generate";
 
 const generateStore = useGenerateStore();
 
@@ -86,6 +87,7 @@ const removeAccepted = (id: string) => {
                 icon="pi pi-check-circle"
                 @click="generateStore.save"
             />
+            <Button label="Cancel" fluid icon="pi pi-times" @click="generateStore.cancel" />
         </div>
         <Fill center v-if="step === GenerationStep.Saving">
             <Loading data="Saving" />
