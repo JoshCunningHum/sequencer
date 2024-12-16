@@ -85,6 +85,7 @@ const removeAccepted = (id: string) => {
                 label="Accept Output"
                 fluid
                 icon="pi pi-check-circle"
+                severity="danger"
                 @click="generateStore.save"
             />
             <Button label="Cancel" fluid icon="pi pi-times" @click="generateStore.cancel" />
